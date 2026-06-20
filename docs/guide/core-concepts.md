@@ -1,114 +1,105 @@
 # Core Concepts
 
-ts-plate is built around a simple insight: a file tree is just a tree, and a
-tree can be flattened. That's it. Everything else follows from this.
+ts-plate is built around a simple idea: file generation works best when the shape of the project stays visible.
 
-## The two representations
+Instead of hiding the structure inside a template language or a CLI convention, ts-plate keeps it as plain TypeScript data until the moment you decide to emit it.
 
-Trees and flat lists are the same data, viewed differently. ts-plate gives you
-both, and you switch between them with `emit()`.
+## Two views of the same thing
 
-### Tree representation
+You can think about a project in two equally valid ways:
 
-This is what you build with `file()`, `dir()`, `root()`, and friends. Trees are
-good for composition: you can nest things, conditionally include subtrees, and
-pass trees around as values.
+- as a tree while you are composing it
+- as a flat list while you are inspecting or writing it
+
+`ts-plate` gives you both.
+
+### Tree view
+
+This is the model you build with `file()`, `dir()`, `root()`, `when()`, and `copy()`.
 
 ```ts
 const tree = root(dir("src", file("index.ts"), dir("utils", file("helpers.ts"))));
 ```
 
-Every tree node is a plain object with a `type` discriminant. No classes, no
-prototypes, no surprises.
+Tree nodes are plain objects with a `type` field. That keeps them easy to pass around, easy to test, and easy to reason about.
 
-```
-{ type: "root", children: [ ... ] }
-{ type: "dir",  name: "src", children: [ ... ] }
-{ type: "file", name: "index.ts", content: "..." }
-```
+### Flat view
 
-### Flat representation
-
-This is what `emit()` returns — an ordered array of `Output` entries. Flat
-lists are good for inspection, serialization, filtering, and writing.
+This is what `emit()` returns:
 
 ```ts
 const outputs = await emit(tree);
-
-for (const output of outputs) {
-  console.log(output.path); // e.g. "src/index.ts"
-}
 ```
 
-Each output also has a `type`:
+The flat representation is useful because it is honest. It tells you exactly what would be written, in the order it will be written, without making you touch the filesystem first.
 
-```
-{ type: "dir",  path: "src" }
-{ type: "file", path: "src/index.ts", content: "..." }
-{ type: "dir",  path: "src/utils" }
-{ type: "file", path: "src/utils/helpers.ts" }
-```
+That means you can:
 
-You can manipulate this array before writing. Filter files, rename paths, add
-entries — it's just an array.
+- snapshot the result in tests
+- filter or rename paths
+- count files before writing
+- render a dry run for the user
 
-## Node types
+## The nodes
 
 ### `file(name, content?)`
 
-A file node. `content` is optional and can be:
+A file node describes a file name and optional content.
 
-- A `string`
-- A plain object (serialized as JSON at write time)
-- A sync function `() => string | object`
-- An async function `() => Promise<string | object>`
+`content` can be:
+
+- a string
+- a plain object, which becomes JSON when written
+- a sync function
+- an async function
 
 ```ts
 file("readme.md", "# Hello");
 file("package.json", { name: "my-pkg", version: "1.0.0" });
 file("timestamp.txt", () => new Date().toISOString());
 file("data.json", async () => {
-  const res = await fetch(url);
+  const res = await fetch("https://api.example.com/data");
   return res.json();
 });
 ```
 
+The lazy function forms are especially useful when the output depends on the current environment, a network request, or a value you only want to compute once the tree is actually emitted.
+
 ### `dir(name, ...children)`
 
-A directory node. Children can be any node type. Directories with no children
-are allowed — they produce an empty folder on disk.
+A directory node groups children under a folder.
 
 ```ts
-dir("empty-folder");
 dir("src", file("index.ts"), dir("lib"));
 ```
 
+Empty directories are allowed. If you ask for one, you get one.
+
 ### `root(...children)`
 
-A container node. Use it to group multiple top-level entries. You can also pass
-multiple roots to `emit()`:
+A root node is just a container. It is the clean way to group top-level entries or reuse a subtree in more than one place.
 
 ```ts
 const a = root(file("a.txt"));
 const b = root(file("b.txt"));
-await emit(a, b); // two files at root level
+await emit(a, b);
 ```
 
 ### `when(condition, ...children)`
 
-A conditional node that includes children only when `condition` is truthy.
-Accepts a `boolean` or a `() => boolean` function for lazy evaluation.
+Conditional nodes are how you keep the tree expressive without making it noisy.
 
 ```ts
-when(true, file("always.txt")); // always included
-when(false, file("never.txt")); // always skipped
-when(() => opts.debug, file("debug.log")); // evaluated at emit time
+when(true, file("always.txt"));
+when(false, file("never.txt"));
+when(() => opts.debug, file("debug.log"));
 ```
+
+The condition can be a boolean or a function. That keeps the decision lazy when you need it.
 
 ### `copy(from, name)`
 
-A node that represents a file to be copied from an external path. The actual
-copy happens during `write()`.
+`copy()` represents a file that already exists somewhere else. ts-plate does not inline the file immediately; it preserves the copy as a first-class output and performs the actual copy during `write()`.
 
 ```ts
 copy("/Users/me/templates/license.txt", "LICENSE");
@@ -116,57 +107,43 @@ copy("/Users/me/templates/license.txt", "LICENSE");
 
 ## The pipeline
 
-```
-Build  ──emit()──>  Flat outputs  ──write()──>  Disk
-                        │
-                        ▼
-                   Inspect / filter / transform
+The library is easiest to understand as a three-stage pipeline:
+
+```text
+Build  ->  Emit  ->  Write
 ```
 
-Each stage is optional. You could build a tree and only emit without writing
-(useful for dry runs). You could build outputs manually and only write (if you
-don't need the tree abstraction). Or you could inspect the flat list between
-emit and write to verify everything looks right.
+Or, if you prefer the fuller version:
 
-`render()` is a shortcut that chains emit and write together:
+```text
+Build  ->  Flat outputs  ->  Disk
+              |
+              v
+         Inspect / filter / transform
+```
 
-```
-Build  ──render()──>  Disk + Flat outputs
-```
+Each stage is optional:
+
+- build trees when you want composability
+- emit outputs when you want visibility
+- write outputs when you are ready to persist them
+
+`render()` is just the convenience path that does emit and write in sequence.
 
 ## Deterministic ordering
 
-Outputs are always ordered the same way:
+Ordering is deliberately stable:
 
-1. Depth-first walk of the tree
-2. Directory entries appear before their children
-3. Children maintain insertion order
+1. depth-first traversal
+2. directories before their children
+3. children preserved in insertion order
 
-This means two things:
+That sounds technical, but it is really about trust. If the same tree produces the same outputs every time, you can write tests with confidence and build tooling on top of it without guessing.
 
-- You can rely on parent directories existing before their children when writing
-- The output array is reproducible — same tree, same order, every time
+## Why this shape works
 
-## Why both representations?
+Tree structures are good for composition. Flat structures are good for processing.
 
-Trees compose. Flat lists process.
+ts-plate does not force you to choose one forever. It lets you move from one view to the other at the right time.
 
-With trees, you can build a subtree once and reuse it in multiple places:
-
-```ts
-const shared = root(file("LICENSE"), file(".gitignore", "node_modules\ndist\n"));
-
-const projectA = root(dir("app-a", shared.children));
-const projectB = root(dir("app-b", shared.children));
-```
-
-With flat lists, you can inspect what _would_ be written before actually
-writing anything:
-
-```ts
-const outputs = await emit(tree);
-const fileOutputs = outputs.filter((o) => o.type === "file");
-console.log(`Will write ${fileOutputs.length} files`);
-```
-
-Both views matter. Neither replaces the other.
+That is the entire design philosophy: keep generation code readable, keep the output inspectable, and keep the API small enough that the important part remains your own logic.

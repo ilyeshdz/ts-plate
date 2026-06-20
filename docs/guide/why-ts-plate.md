@@ -1,35 +1,29 @@
 # Why ts-plate?
 
-There are a lot of file scaffolding tools out there. I tried most of them, and
-they all left me with the same feeling: _why does this have to be so
-complicated?_
+There are plenty of ways to generate files. I have used enough of them to know that most of the friction is not about writing files. It is about expressing intent.
+
+The moment a generator starts hiding logic inside templates, conventions, or framework-specific rules, the code becomes harder to understand than the thing it was supposed to produce.
+
+ts-plate was written to avoid that.
 
 ## The template problem
 
-Every scaffolder makes you learn a template language. EJS, Handlebars, Jinja,
-Liquid — they all look like programming but aren't quite. You end up with things
-like:
+Template languages are fine until they are not.
 
-```ejs
-<% if (useTypescript) { %>import { Foo } from "./foo";<% } %>
-```
+They ask you to switch mental models: code here, string interpolation there, control flow somewhere else. That split is tolerable for a small snippet, but it becomes tiring once a generator grows into something your team relies on.
 
-It's string interpolation pretending to be logic. Your IDE doesn't understand
-it. Formatting breaks. One missing `<%` and your whole scaffold is garbage.
+You end up debugging formatting, indentation, escaping, and context instead of the actual structure of the output.
 
-And the worst part? You already know how to write TypeScript. Why not use it?
+With ts-plate, the generator stays in TypeScript. The logic lives where your editor, formatter, tests, and types already understand it.
 
 ## The composition problem
 
-Most tools make you define your file tree in a config file or a template
-directory. You can't compose trees from other trees. You can't reuse parts.
-You can't pass a subtree to a function, get a different subtree back, and plug
-it somewhere else.
+Most scaffolding tools are good at producing one project at a time. They are much less good at composition.
 
-But with ts-plate, composition is the entire point:
+ts-plate treats composition as the normal case:
 
 ```ts
-function generateReactComponent(name: string) {
+function component(name: string) {
   return dir(
     name,
     file(`${name}.tsx`, componentTemplate(name)),
@@ -41,35 +35,73 @@ function generateReactComponent(name: string) {
 const app = root(
   dir(
     "src",
-    generateReactComponent("Button"),
-    generateReactComponent("Card"),
-    generateReactComponent("Modal"),
+    component("Button"),
+    component("Card"),
+    component("Modal"),
   ),
 );
 ```
 
-This isn't a special feature. It's just functions calling functions.
+That style is not a special plugin or framework trick. It is just ordinary functions returning ordinary data.
 
 ## The evaluation problem
 
-When do templates get evaluated? During generation, sure — but what if you want
-to generate content that depends on the current time, an API response, or a
-random value?
+Generation often depends on values you do not know until the last moment:
 
-In ts-plate, file content can be a function that runs _at emit time_, not at
-tree-build time. This means you can create lazy content that only evaluates
-when someone actually calls `emit()`:
+- timestamps
+- environment flags
+- user input
+- API responses
+- generated IDs
+
+If content is locked into a template too early, you lose some of that flexibility.
+
+ts-plate keeps file content lazy until `emit()` runs:
 
 ```ts
 const node = file("timestamp.txt", () => new Date().toISOString());
-// This runs only when emit() is called, not when file() is
 ```
 
-It also means conditional content stays out of memory until it's needed. If you
-build a massive tree but only emit a subset, the unused content functions never
-run.
+That matters when you want the generator to remain honest about when work happens.
 
-## How it compares
+## Why not a CLI?
+
+This is one of the most important design choices in the project.
+
+ts-plate intentionally does not try to be the whole experience. It is not a one-command project starter and it does not have an opinionated prompt flow or folder wizard baked into it.
+
+That is a feature, not a limitation.
+
+If you are building a CLI, you probably want to control:
+
+- prompts
+- validation
+- file selection
+- dry runs
+- previews
+- custom business rules
+
+ts-plate gives you the file-tree layer underneath all of that, and lets your CLI stay yours.
+
+## When it is a good fit
+
+ts-plate is a strong fit when you want:
+
+- a fully type-driven way to build generators
+- a small library that stays out of the way
+- outputs you can inspect before writing
+- code that looks like code, not a template dialect
+- a foundation for tools like Bitpress, custom CLIs, or internal scaffolding systems
+
+## When it is not
+
+ts-plate is not the best answer for everyone.
+
+If you want a polished turnkey scaffolder with lots of opinionated defaults, you may be happier with tools that already provide that experience.
+
+If, however, your goal is to build a generator that feels like real software instead of a pile of string templates, ts-plate is a much better starting point.
+
+## A quick comparison
 
 |                            | ts-plate | Yeoman / Plop    | scaffdog      | Degit   |
 | -------------------------- | -------- | ---------------- | ------------- | ------- |
@@ -80,14 +112,4 @@ run.
 | Composition via functions  | Yes      | Limited          | Limited       | No      |
 | Tree + flat representation | Yes      | No               | No            | No      |
 
-## When NOT to use ts-plate
-
-ts-plate is a library, not a CLI tool. You won't run `npx ts-plate init my-app`
-— that's not what it does. If you want a ready-made scaffolding CLI, you might
-be happier with [Plop](https://plopjs.com/) or
-[degit](https://github.com/Rich-Harris/degit).
-
-But if you're building a tool that _generates files_ — a CLI of your own, a
-project initializer, a code generator for your framework — ts-plate is the
-engine under the hood. It does one thing (tree → flat outputs → disk) and does
-it without getting in your way.
+That table is not here to suggest every other tool is wrong. It is here to make the tradeoff obvious. ts-plate exists for people who want the generator layer to feel like regular TypeScript.

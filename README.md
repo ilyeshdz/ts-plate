@@ -1,34 +1,43 @@
 # @ilyeshdz/ts-plate
 
-> Build file trees with functions, not templates.
+> Build file trees with TypeScript, not templates.
 
 [![npm](https://img.shields.io/npm/v/@ilyeshdz/ts-plate)](https://www.npmjs.com/package/@ilyeshdz/ts-plate)
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
 
-A tiny, zero-dependency TypeScript library for composing file structures the same way you write code — with functions, conditions, and composition. No CLI. No template language. No magic.
+`ts-plate` is a tiny, zero-dependency TypeScript library for composing file trees the way you already write software: with functions, data, conditions, and composition.
 
-## Table of Contents
+It is not a scaffolding CLI. It is the engine you reach for when you want to build one.
 
-- [Background](#background)
-- [Install](#install)
-- [Usage](#usage)
-- [API](#api)
-- [Contributing](#contributing)
-- [License](#license)
+## Why this exists
 
-## Background
+Most generator tools ask you to learn a second way of thinking. They ship a template language, a directory convention, or a CLI workflow that is fine until your project stops being simple.
 
-I've used Yeoman, Plop, Hygen, and every other scaffolder out there. They all share the same problem: they make you learn a second language. Templates, EJS, Handlebars, Jinja — you end up fighting syntax, debugging indentation, and wishing you could just use the language you already know.
+`ts-plate` takes a different path:
 
-That's why ts-plate exists. Your file tree is just data. Functions build it, conditions shape it, and at the end you get a flat list of files you can inspect, filter, or write to disk. Three stages, one pipeline:
+- write generator logic in TypeScript
+- keep your file tree as data
+- inspect the result before it hits disk
+- stay fully in control of how your tool behaves
 
-- **Build** — compose trees with `file()`, `dir()`, `root()`, `when()`, `copy()`
-- **Emit** — flatten the tree into a deterministic array of outputs
-- **Write** — optionally write those entries to disk
+That makes it a good fit for teams building custom CLIs, code generators, project starters, and systems like Bitpress that need a small but serious foundation underneath them.
 
-Each stage is independent. You can emit without writing, write without emitting, or inspect the flat list before committing anything.
+If you want a ready-made `npx ...` experience, this is probably not the right package. If you want a minimal library that lets you build that experience yourself, this is exactly the point.
 
-For more on the philosophy and how ts-plate compares to other tools, see [Why ts-plate?](https://github.com/ilyeshdz/ts-plate/guide/why-ts-plate).
+## What it gives you
+
+`ts-plate` is intentionally small. The entire library is built around three stages:
+
+1. **Build** a tree with `file()`, `dir()`, `root()`, `when()`, and `copy()`
+2. **Emit** that tree into a deterministic flat list
+3. **Write** the outputs to disk when you are ready
+
+That separation matters. It means you can:
+
+- dry-run a generator before writing anything
+- filter or transform outputs before they land on disk
+- reuse the same tree in multiple contexts
+- keep the logic readable for future maintainers
 
 ## Install
 
@@ -44,9 +53,9 @@ yarn add @ilyeshdz/ts-plate
 bun add @ilyeshdz/ts-plate
 ```
 
-## Usage
+## Quick start
 
-The simplest thing you can do is create a file and emit it:
+The smallest useful example is a single file:
 
 ```ts
 import { file, emit } from "@ilyeshdz/ts-plate";
@@ -55,11 +64,11 @@ const outputs = await emit(file("hello.txt", "Hello, world!"));
 // [{ type: "file", path: "hello.txt", content: "Hello, world!" }]
 ```
 
-`emit` returns a flat list of outputs. Nothing touches disk — you can inspect the array, modify it, or pass it to `write()`.
+`emit()` returns a flat array. Nothing touches the filesystem yet, which means you can inspect, transform, or test the result before writing it.
 
-### Directories and nesting
+## Directories and nesting
 
-Real projects have folders. `dir()` creates one, and you nest children inside it:
+Real projects are trees, so `dir()` lets you nest structure naturally:
 
 ```ts
 import { root, dir, file, emit } from "@ilyeshdz/ts-plate";
@@ -75,53 +84,57 @@ const tree = root(
 const outputs = await emit(tree);
 ```
 
-Outputs are ordered deterministically: depth-first, parents before children.
+The emitted order is deterministic: parents first, then children, depth-first. That makes the output predictable for tests and safe for downstream tooling.
 
-### Writing to disk
+## Writing to disk
+
+When you are happy with the outputs, write them:
 
 ```ts
 import { write } from "@ilyeshdz/ts-plate";
 
 await write(outputs);
-// Creates files in the current working directory
-
 await write(outputs, "./output");
-// Creates files in ./output
 ```
 
-### Emit + write in one call
+## Emit and write together
+
+If you want the common path in one step, use `render()`:
 
 ```ts
 import { render, root, dir, file } from "@ilyeshdz/ts-plate";
 
-const outputs = await render(root(dir("project", file("index.ts", `console.log("hi")`))), "./out");
+const outputs = await render([root(dir("project", file("index.ts", `console.log("hi")`)))], "./out");
 ```
 
-### Lazy file content
+## Lazy content
 
-Content can be a function evaluated only when `emit()` runs:
+File content can be a function. That function is only evaluated when `emit()` runs:
 
 ```ts
+import { file, emit } from "@ilyeshdz/ts-plate";
+
 const node = file("timestamp.txt", () => new Date().toISOString());
 const [output] = await emit(node);
-// content is computed at emit time, not tree-build time
 ```
 
-Async functions work too:
+Async content works too:
 
 ```ts
 const node = file("readme.md", async () => {
   const res = await fetch("https://api.example.com/docs");
-  return res.text();
+  return await res.text();
 });
 ```
 
-### Conditional nodes
+That lazy boundary is one of the quiet strengths of the library. It keeps generator code honest: you decide when work happens, and nothing is evaluated early by accident.
 
-Include or skip parts of the tree with `when()`:
+## Conditional structure
+
+Use `when()` to include or skip parts of a tree:
 
 ```ts
-import { when } from "@ilyeshdz/ts-plate";
+import { when, root, dir, file } from "@ilyeshdz/ts-plate";
 
 const tree = root(
   file("index.ts"),
@@ -131,44 +144,25 @@ const tree = root(
 );
 ```
 
-### Copy external files
+## Copying files
 
-Reference a file outside the tree and have it copied at write time:
-
-```ts
-import { copy } from "@ilyeshdz/ts-plate";
-
-const tree = root(file("README.md", "# Project"), copy("/absolute/path/to/LICENSE", "LICENSE"));
-```
-
-### Full project scaffold
-
-A more complete example combining everything:
+`copy()` is for pulling a file from outside the tree and copying it at write time:
 
 ```ts
-import { render, root, dir, file, when } from "@ilyeshdz/ts-plate";
+import { copy, root } from "@ilyeshdz/ts-plate";
 
-interface Options {
-  name: string;
-  typescript?: boolean;
-  tests?: boolean;
-}
-
-async function scaffold(opts: Options) {
-  const tree = root(
-    dir(
-      opts.name,
-      file("README.md", `# ${opts.name}`),
-      file("package.json", { name: opts.name, version: "0.1.0", type: "module" }),
-      dir("src", file(opts.typescript ? "index.ts" : "index.js", "")),
-      when(opts.tests, dir("tests", file("index.test.ts", ""))),
-    ),
-  );
-  return render(tree);
-}
+const tree = root(copy("/absolute/path/to/LICENSE", "LICENSE"));
 ```
 
-For more recipes, check the [Recipes guide](https://github.com/ilyeshdz/ts-plate/guide/recipes).
+## The mental model
+
+The library is easiest to understand if you remember this:
+
+- build with tree nodes
+- inspect with emitted outputs
+- persist with `write()`
+
+That is the whole philosophy. No hidden runtime, no template engine, no CLI layer pretending to be a library.
 
 ## API
 
@@ -183,19 +177,21 @@ For more recipes, check the [Recipes guide](https://github.com/ilyeshdz/ts-plate
 | `when(condition, ...children)` | Conditionally include nodes         |
 | `copy(from, name)`             | Copy an external file into the tree |
 
-See the [full API reference](https://github.com/ilyeshdz/ts-plate/api/) for details and types.
+See the [API reference](./docs/api/index.md) and the [guides](./docs/guide/getting-started.md) for more detail.
 
 ## Contributing
 
-PRs and issues are welcome! This project is small, focused, and meant to stay that way — but if you have an idea that fits, feel free to open an issue first to discuss it.
+Issues and pull requests are welcome.
 
-This project uses [oxlint](https://oxc.rs/) for linting, [oxfmt](https://oxc.rs/) for formatting, and [Vitest](https://vitest.dev/) for tests.
+This project is intentionally small, so changes should earn their place. If you have an idea that improves the library or its documentation, open an issue first so we can keep the direction clear.
+
+Development:
 
 ```bash
 pnpm install
 pnpm test
 pnpm build
-pnpm docs:dev    # documentation dev server
+pnpm docs:dev
 ```
 
 ## License

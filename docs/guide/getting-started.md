@@ -1,12 +1,14 @@
 # Getting Started
 
+ts-plate is deliberately uncomplicated. If you can write TypeScript, you already know most of what you need.
+
 ## Install
 
 ```bash
 npm install @ilyeshdz/ts-plate
 ```
 
-Or with your package manager of choice:
+Or use your package manager of choice:
 
 ```bash
 pnpm add @ilyeshdz/ts-plate
@@ -14,43 +16,34 @@ yarn add @ilyeshdz/ts-plate
 bun add @ilyeshdz/ts-plate
 ```
 
-That's it. One dependency, zero transitive deps.
-
 ## Your first tree
 
-The simplest possible thing you can do is create a single file and emit it:
+Start with a single file and emit it:
 
 ```ts
 import { file, emit } from "@ilyeshdz/ts-plate";
 
 const outputs = await emit(file("hello.txt", "Hello, world!"));
-// [{ type: "file", path: "hello.txt", content: "Hello, world!" }]
 ```
 
-`emit` gives you a flat list of outputs. Nothing is written to disk yet — you
-can inspect the array, modify it, or pass it to `write()`.
+`emit()` turns tree nodes into a flat list of outputs. That list is the first place where the project becomes tangible: you can log it, snapshot it, transform it, or pass it on to `write()`.
 
-## Writing to disk
+## Write it to disk
 
-Once you have outputs, writing them is straightforward:
+If the outputs look right, write them:
 
 ```ts
 import { write } from "@ilyeshdz/ts-plate";
 
 await write(outputs);
-// Creates hello.txt in the current working directory
-```
-
-Pass a `basePath` to control where files are written:
-
-```ts
 await write(outputs, "./output");
-// Creates ./output/hello.txt
 ```
 
-## Directories and nesting
+The optional `basePath` is useful when you want to target a temp directory, a build folder, or a user-selected workspace.
 
-Real projects have folders. `dir()` creates one, and you nest children inside it:
+## Add structure
+
+Real projects need folders, not just files. `dir()` lets you express that directly:
 
 ```ts
 import { root, dir, file, emit } from "@ilyeshdz/ts-plate";
@@ -59,48 +52,36 @@ const tree = root(
   dir(
     "project",
     file("README.md", "# My Project"),
-    dir(
-      "src",
-      file("index.ts", `console.log("hello")`),
-      dir("utils", file("math.ts", `export const add = (a, b) => a + b`)),
-    ),
+    dir("src", file("index.ts", `console.log("hello")`)),
   ),
 );
 
 const outputs = await emit(tree);
 ```
 
-The result is a flat, ordered list of directories and files:
+The emitted result is deterministic:
 
-```
-[
-  { type: "dir",  path: "project" },
-  { type: "file", path: "project/README.md",       content: "# My Project" },
-  { type: "dir",  path: "project/src" },
-  { type: "file", path: "project/src/index.ts",     content: 'console.log("hello")' },
-  { type: "dir",  path: "project/src/utils" },
-  { type: "file", path: "project/src/utils/math.ts", content: "export const add = (a, b) => a + b" },
-]
-```
+- directories appear before their children
+- traversal is depth-first
+- insertion order is preserved
 
-Directories come before their contents — that's a guarantee. The order is always
-deterministic: depth-first, children after parent.
+That predictability is not a cosmetic detail. It is what makes the library pleasant to test and easy to reason about.
 
-## Using `render()` for convenience
+## Use `render()` when you want the common path
 
-If you just want to emit and write in one step, use `render()`:
+If your workflow is simply "build then write", `render()` does both:
 
 ```ts
 import { render, root, dir, file } from "@ilyeshdz/ts-plate";
 
-const outputs = await render(root(dir("project", file("index.ts", `console.log("hi")`))), "./out");
-
-// Files are on disk, and outputs are still returned for inspection
+const outputs = await render([root(dir("project", file("index.ts", `console.log("hi")`)))], "./out");
 ```
 
-## What's next?
+You still get the emitted outputs back, which means the operation remains inspectable even when the filesystem has already been updated.
 
-- [Why ts-plate?](/guide/why-ts-plate) — philosophy and how it compares
-- [Core Concepts](/guide/core-concepts) — the tree + flat model explained
-- [API Reference](/api/) — every function and type documented
-- [Recipes](/guide/recipes) — practical patterns and real-world examples
+## What to read next
+
+- [Why ts-plate?](/guide/why-ts-plate) for the philosophy and tradeoffs
+- [Core Concepts](/guide/core-concepts) for the tree and flat-output model
+- [Recipes](/guide/recipes) for practical patterns
+- [API Reference](/api/) for the full type surface

@@ -1,10 +1,10 @@
 # Recipes
 
-Practical patterns for using ts-plate in real scenarios.
+These are the patterns ts-plate is meant to support in the real world: reusable generators, dry runs, content transforms, and CLI workflows that stay easy to understand months later.
 
-## Custom generator function
+## A reusable generator function
 
-Wrap a tree in a function and reuse it across projects:
+The most natural way to use ts-plate is to wrap a tree in a function and reuse it:
 
 ```ts
 import { dir, file, type Node } from "@ilyeshdz/ts-plate";
@@ -27,7 +27,7 @@ function nodePackage(name: string): Node {
 }
 ```
 
-Then use it anywhere:
+Then compose it wherever you need it:
 
 ```ts
 const workspace = root(
@@ -37,9 +37,11 @@ const workspace = root(
 );
 ```
 
-## Project scaffold
+That is the library's sweet spot: small functions that produce predictable structure.
 
-Generate a full project with a single tree:
+## Project scaffolding
+
+Here is a more complete starter that mixes options, conditionals, and output rendering:
 
 ```ts
 import { render, root, dir, file, when } from "@ilyeshdz/ts-plate";
@@ -68,34 +70,34 @@ async function scaffold(opts: ScaffoldOptions) {
 
   return render(tree);
 }
-
-await scaffold({ name: "my-app", typescript: true, tests: true });
 ```
 
-## Dry run
+This is the pattern behind most serious generator tools: ask for a few choices, build a tree, and let the library handle the filesystem part.
 
-Inspect what would be written before writing:
+## Dry run before writing
+
+Because `emit()` returns plain data, it is easy to show the user what will happen before anything is written:
 
 ```ts
 import { emit, root, dir, file } from "@ilyeshdz/ts-plate";
 
 const tree = root(dir("output", file("data.txt", "hello"), file("config.json", { debug: true })));
-
 const outputs = await emit(tree);
 
-console.log("Plan:");
-for (const o of outputs) {
-  if (o.type === "file") {
-    console.log(`  📄 ${o.path} (${o.content?.length ?? 0} chars)`);
+for (const output of outputs) {
+  if (output.type === "file") {
+    console.log(`FILE  ${output.path}`);
   } else {
-    console.log(`  📁 ${o.path}`);
+    console.log(`DIR   ${output.path}`);
   }
 }
 ```
 
+That kind of preview is one of the nicest things you can offer in a custom CLI.
+
 ## Lazy content from an API
 
-Generate files whose content comes from an external source:
+When output depends on external data, keep the fetch inside the node:
 
 ```ts
 import { root, dir, file, emit, write } from "@ilyeshdz/ts-plate";
@@ -115,12 +117,14 @@ const outputs = await emit(tree);
 await write(outputs);
 ```
 
+This keeps your generator logic localized. The tree still describes the shape of the project, even when the content itself comes from somewhere else.
+
 ## Multi-root output
 
-Emit multiple independent trees into a single flat list:
+Sometimes you want more than one top-level tree:
 
 ```ts
-import { emit, root, file } from "@ilyeshdz/ts-plate";
+import { emit, root, file, dir } from "@ilyeshdz/ts-plate";
 
 const configFiles = root(
   file(".gitignore", "node_modules\ndist\n"),
@@ -129,20 +133,14 @@ const configFiles = root(
 
 const sourceFiles = root(dir("src", file("index.ts")), dir("tests"));
 
-// Combine both trees
 const allOutputs = await emit(configFiles, sourceFiles);
-// [
-//   { type: "file", path: ".gitignore", ... },
-//   { type: "file", path: ".npmrc", ... },
-//   { type: "dir",  path: "src" },
-//   { type: "file", path: "src/index.ts", ... },
-//   { type: "dir",  path: "tests" },
-// ]
 ```
 
-## Interactive CLI scaffold
+This is useful for generators that assemble a workspace from several independent pieces.
 
-Build a simple CLI that asks questions and scaffolds files:
+## A simple interactive CLI
+
+ts-plate is often most valuable when it is embedded inside your own CLI:
 
 ```ts
 import { createInterface } from "node:readline/promises";
@@ -177,9 +175,11 @@ const outputs = await render(
 console.log(`Created ${outputs.length} entries.`);
 ```
 
+The important part here is not the prompts. It is the fact that the same tree can be used for preview, validation, and writing.
+
 ## Transforming outputs before writing
 
-Since outputs is just an array, you can transform it:
+Since `emit()` returns an array, you can transform it however you want:
 
 ```ts
 import { emit, write, root, dir, file } from "@ilyeshdz/ts-plate";
@@ -187,14 +187,14 @@ import { emit, write, root, dir, file } from "@ilyeshdz/ts-plate";
 const tree = root(dir("build", file("output.txt", "data")));
 let outputs = await emit(tree);
 
-// Prepend a base path to all outputs
 outputs = outputs.map((o) => ({
   ...o,
   path: `project-${Date.now()}/${o.path}`,
 }));
 
-// Filter out empty directories
 outputs = outputs.filter((o) => o.type !== "dir");
 
 await write(outputs);
 ```
+
+That pattern is especially useful when you want to enforce naming rules, inject a release prefix, or send the outputs through an additional validation step before touching disk.

@@ -4,9 +4,12 @@ export default defineConfig({
   base: process.env.DOCS_BASE || "/",
 
   title: "ts-plate",
-  description: "A lightweight library for building file trees declaratively.",
+  description: "A tiny TypeScript library for composing file trees and generator output.",
+  cleanUrls: true,
+  lastUpdated: true,
 
   themeConfig: {
+    siteTitle: "ts-plate",
     nav: [
       { text: "Home", link: "/" },
       { text: "Guide", link: "/guide/getting-started" },
@@ -31,5 +34,10 @@ export default defineConfig({
         },
       ],
     },
+    footer: {
+      message: "Built for people who want generators to feel like real TypeScript.",
+      copyright: "MIT Licensed.",
+    },
+    socialLinks: [{ icon: "github", link: "https://github.com/ilyeshdz/ts-plate" }],
   },
 });
