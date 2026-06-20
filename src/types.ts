@@ -1,20 +1,33 @@
-export type Node = FileNode | DirectoryNode;
+export type Node = RootNode | FileNode | DirectoryNode;
 
 export type FileContent = string | Record<string, any>;
 
 export interface FileNode {
     type: 'file';
-    path: string;
+    name: string;
     content?: FileContent;
 }
 
 export interface DirectoryNode {
     type: 'dir';
-    path: string;
+    name: string;
     children: Node[];
 }
 
 export interface RootNode {
     type: 'root';
     children: Node[];
+}
+
+export type Output = OutputFile | OutputDirectory;
+
+export interface OutputFile {
+    type: 'file';
+    path: string;
+    content?: FileContent;
+}
+
+export interface OutputDirectory {
+    type: 'dir';
+    path: string;
 }
