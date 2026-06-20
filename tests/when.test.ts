@@ -12,9 +12,7 @@ test("when false excludes children", () => {
 });
 
 test("when with lazy condition (true)", () => {
-  expect(emit(when(() => true, file("a.txt")))).toEqual([
-    { type: "file", path: "a.txt" },
-  ]);
+  expect(emit(when(() => true, file("a.txt")))).toEqual([{ type: "file", path: "a.txt" }]);
 });
 
 test("when with lazy condition (false)", () => {
