@@ -1,17 +1,17 @@
 {
-  "name": "tsdown-starter",
+  "name": "ts-plate",
   "type": "module",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "A starter for creating a TypeScript package.",
-  "author": "Author Name <author.name@mail.com>",
+  "author": "Ilyes Hernandez <hdz.ilyes@gmail.com>",
   "license": "MIT",
-  "homepage": "https://github.com/author/library#readme",
+  "homepage": "https://github.com/ilyeshdz/ts-plate#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/author/library.git"
+    "url": "git+https://github.com/ilyeshdz/ts-plate.git"
   },
   "bugs": {
-    "url": "https://github.com/author/library/issues"
+    "url": "https://github.com/ilyeshdz/ts-plate/issues"
   },
   "exports": {
     ".": "./dist/index.mjs",
