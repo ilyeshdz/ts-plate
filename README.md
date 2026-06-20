@@ -10,13 +10,13 @@ npm install ts-plate
 
 ## API Overview
 
-| Function | Description |
-|----------|-------------|
-| `file(name, content?)` | Create a file node |
-| `dir(name, ...children)` | Create a directory node |
-| `root(...children)` | Create a root container |
-| `plate(...nodes)` | Flatten tree(s) into output entries |
-| `write(outputs, basePath?)` | Write outputs to disk |
+| Function                    | Description                         |
+| --------------------------- | ----------------------------------- |
+| `file(name, content?)`      | Create a file node                  |
+| `dir(name, ...children)`    | Create a directory node             |
+| `root(...children)`         | Create a root container             |
+| `plate(...nodes)`           | Flatten tree(s) into output entries |
+| `write(outputs, basePath?)` | Write outputs to disk               |
 
 ## Usage
 
@@ -26,10 +26,7 @@ npm install ts-plate
 import { plate, root, dir, file } from "ts-plate";
 
 const tree = root(
-  dir("src",
-    file("index.ts", `console.log("hello")`),
-    dir("utils", file("helpers.ts")),
-  ),
+  dir("src", file("index.ts", `console.log("hello")`), dir("utils", file("helpers.ts"))),
 );
 
 const outputs = plate(tree);
@@ -47,7 +44,8 @@ const outputs = plate(tree);
 import { plate, root, dir, file, write } from "ts-plate";
 
 const scaffold = root(
-  dir("my-package",
+  dir(
+    "my-package",
     file("package.json", {
       name: "my-package",
       version: "0.0.1",
@@ -56,12 +54,8 @@ const scaffold = root(
     file("tsconfig.json", {
       compilerOptions: { strict: true, target: "ESNext" },
     }),
-    dir("src",
-      file("index.ts", "export const greet = (name: string) => `Hello ${name}`;"),
-    ),
-    dir("tests",
-      file("greet.test.ts"),
-    ),
+    dir("src", file("index.ts", "export const greet = (name: string) => `Hello ${name}`;")),
+    dir("tests", file("greet.test.ts")),
   ),
 );
 

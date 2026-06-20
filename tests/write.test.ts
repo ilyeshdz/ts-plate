@@ -43,7 +43,11 @@ test("writes nested files and directories", async () => {
     { type: "dir" as const, path: "src" },
     { type: "file" as const, path: "src/index.ts", content: 'console.log("hi")' },
     { type: "dir" as const, path: "src/utils" },
-    { type: "file" as const, path: "src/utils/helpers.ts", content: "export const add = (a: number, b: number) => a + b" },
+    {
+      type: "file" as const,
+      path: "src/utils/helpers.ts",
+      content: "export const add = (a: number, b: number) => a + b",
+    },
   ];
 
   await write(outputs, "/");
@@ -51,21 +55,32 @@ test("writes nested files and directories", async () => {
   expect(fs.statSync("/src").isDirectory()).toBe(true);
   expect(fs.statSync("/src/utils").isDirectory()).toBe(true);
   expect(fs.readFileSync("/src/index.ts", "utf-8")).toBe('console.log("hi")');
-  expect(fs.readFileSync("/src/utils/helpers.ts", "utf-8")).toBe("export const add = (a: number, b: number) => a + b");
+  expect(fs.readFileSync("/src/utils/helpers.ts", "utf-8")).toBe(
+    "export const add = (a: number, b: number) => a + b",
+  );
 });
 
 test("uses custom basePath", async () => {
-  await write([{ type: "dir", path: "sub" }, { type: "file", path: "sub/readme.md", content: "# hi" }], "/custom");
+  await write(
+    [
+      { type: "dir", path: "sub" },
+      { type: "file", path: "sub/readme.md", content: "# hi" },
+    ],
+    "/custom",
+  );
 
   expect(fs.readFileSync("/custom/sub/readme.md", "utf-8")).toBe("# hi");
 });
 
 test("writes multiple outputs", async () => {
-  await write([
-    { type: "file", path: "a.txt", content: "aaa" },
-    { type: "file", path: "b.txt", content: "bbb" },
-    { type: "file", path: "c.txt", content: "ccc" },
-  ], "/");
+  await write(
+    [
+      { type: "file", path: "a.txt", content: "aaa" },
+      { type: "file", path: "b.txt", content: "bbb" },
+      { type: "file", path: "c.txt", content: "ccc" },
+    ],
+    "/",
+  );
 
   expect(fs.readFileSync("/a.txt", "utf-8")).toBe("aaa");
   expect(fs.readFileSync("/b.txt", "utf-8")).toBe("bbb");

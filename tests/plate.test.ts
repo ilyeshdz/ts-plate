@@ -6,7 +6,7 @@ test("root with nested directories and files", () => {
     dir(
       "src",
       file("index.ts", 'console.log("hi")'),
-      dir("utils", file("helpers.ts", 'export const add = (a: number, b: number) => a + b')),
+      dir("utils", file("helpers.ts", "export const add = (a: number, b: number) => a + b")),
       dir("types", file("types.ts")),
     ),
   );
@@ -15,7 +15,11 @@ test("root with nested directories and files", () => {
     { type: "dir", path: "src" },
     { type: "file", path: "src/index.ts", content: 'console.log("hi")' },
     { type: "dir", path: "src/utils" },
-    { type: "file", path: "src/utils/helpers.ts", content: 'export const add = (a: number, b: number) => a + b' },
+    {
+      type: "file",
+      path: "src/utils/helpers.ts",
+      content: "export const add = (a: number, b: number) => a + b",
+    },
     { type: "dir", path: "src/types" },
     { type: "file", path: "src/types/types.ts" },
   ]);
@@ -28,9 +32,7 @@ test("single file at root level", () => {
 });
 
 test("single directory at root level", () => {
-  expect(plate(dir("dist"))).toEqual([
-    { type: "dir", path: "dist" },
-  ]);
+  expect(plate(dir("dist"))).toEqual([{ type: "dir", path: "dist" }]);
 });
 
 test("empty root produces no outputs", () => {
@@ -45,21 +47,15 @@ test("multiple roots are flattened together", () => {
 });
 
 test("file with undefined content omits the content field", () => {
-  expect(plate(file("empty.ts"))).toEqual([
-    { type: "file", path: "empty.ts" },
-  ]);
+  expect(plate(file("empty.ts"))).toEqual([{ type: "file", path: "empty.ts" }]);
 });
 
 test("file with empty string content", () => {
-  expect(plate(file("empty.ts", ""))).toEqual([
-    { type: "file", path: "empty.ts", content: "" },
-  ]);
+  expect(plate(file("empty.ts", ""))).toEqual([{ type: "file", path: "empty.ts", content: "" }]);
 });
 
 test("deeply nested tree", () => {
-  const tree = root(
-    dir("a", dir("b", dir("c", file("d.txt", "deep")))),
-  );
+  const tree = root(dir("a", dir("b", dir("c", file("d.txt", "deep")))));
 
   expect(plate(tree)).toEqual([
     { type: "dir", path: "a" },

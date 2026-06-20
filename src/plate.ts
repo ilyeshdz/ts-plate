@@ -9,7 +9,6 @@ export function plate(...nodes: Node[]): Output[] {
 
   function walk(node: Node, basePath: string) {
     switch (node.type) {
-
       case "root":
         for (const child of node.children) {
           walk(child, basePath);
@@ -31,7 +30,7 @@ export function plate(...nodes: Node[]): Output[] {
         outputs.push({
           type: "file",
           path: join(basePath, node.name),
-          content: node.content
+          content: node.content,
         });
         break;
     }

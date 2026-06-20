@@ -1,8 +1,8 @@
-import type { Node, RootNode } from './types'
+import type { Node, RootNode } from "./types";
 
 export function root(...children: Node[]): RootNode {
-    return {
-        type: 'root',
-        children
-    }
+  return {
+    type: "root",
+    children,
+  };
 }

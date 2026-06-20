@@ -4,10 +4,10 @@ import { file } from "../src";
 test("file creates a file node", () => {
   expect(file("index.ts")).toEqual({ type: "file", name: "index.ts" });
 
-  expect(file("app.ts", 'export const a = 1')).toEqual({
+  expect(file("app.ts", "export const a = 1")).toEqual({
     type: "file",
     name: "app.ts",
-    content: 'export const a = 1',
+    content: "export const a = 1",
   });
 });
 
