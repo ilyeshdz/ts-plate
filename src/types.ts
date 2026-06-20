@@ -3,7 +3,7 @@ export type Node = RootNode | FileNode | DirectoryNode | CopyNode | ConditionalN
 export type Condition = boolean | (() => boolean);
 
 export type FileContent = string | Record<string, any>;
-export type FileContentFn = () => FileContent;
+export type FileContentFn = () => FileContent | Promise<FileContent>;
 
 export interface FileNode {
   type: "file";

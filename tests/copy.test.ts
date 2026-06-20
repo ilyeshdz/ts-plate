@@ -20,29 +20,29 @@ test("copy creates a copy node", () => {
   });
 });
 
-test("emit with a copy node at root level", () => {
-  expect(emit(copy("/source/app.ts", "app.ts"))).toEqual([
+test("emit with a copy node at root level", async () => {
+  expect(await emit(copy("/source/app.ts", "app.ts"))).toEqual([
     { type: "copy", path: "app.ts", from: "/source/app.ts" },
   ]);
 });
 
-test("emit with a copy node nested inside a directory", () => {
+test("emit with a copy node nested inside a directory", async () => {
   const tree = root(dir("src", copy("/source/app.ts", "app.ts")));
 
-  expect(emit(tree)).toEqual([
+  expect(await emit(tree)).toEqual([
     { type: "dir", path: "src" },
     { type: "copy", path: "src/app.ts", from: "/source/app.ts" },
   ]);
 });
 
-test("emit with copy node alongside files and dirs", () => {
+test("emit with copy node alongside files and dirs", async () => {
   const tree = root(
     file("readme.md", "# Hello"),
     copy("/source/data.json", "data.json"),
     dir("lib", file("index.ts")),
   );
 
-  expect(emit(tree)).toEqual([
+  expect(await emit(tree)).toEqual([
     { type: "file", path: "readme.md", content: "# Hello" },
     { type: "copy", path: "data.json", from: "/source/data.json" },
     { type: "dir", path: "lib" },

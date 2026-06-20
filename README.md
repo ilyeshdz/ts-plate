@@ -10,14 +10,14 @@ npm install @ilyeshdz/ts-plate
 
 ## API Overview
 
-| Function                    | Description                         |
-| --------------------------- | ----------------------------------- |
-| `file(name, content?)`      | Create a file node                  |
-| `dir(name, ...children)`    | Create a directory node             |
-| `root(...children)`         | Create a root container             |
-| `emit(...nodes)`            | Flatten tree(s) into output entries |
-| `write(outputs, basePath?)` | Write outputs to disk               |
-| `when(condition, ...children)` | Conditionally include nodes      |
+| Function                       | Description                         |
+| ------------------------------ | ----------------------------------- |
+| `file(name, content?)`         | Create a file node                  |
+| `dir(name, ...children)`       | Create a directory node             |
+| `root(...children)`            | Create a root container             |
+| `emit(...nodes)`               | Flatten tree(s) into output entries |
+| `write(outputs, basePath?)`    | Write outputs to disk               |
+| `when(condition, ...children)` | Conditionally include nodes         |
 
 ## Usage
 
@@ -30,7 +30,7 @@ const tree = root(
   dir("src", file("index.ts", `console.log("hello")`), dir("utils", file("helpers.ts"))),
 );
 
-const outputs = emit(tree);
+const outputs = await emit(tree);
 // [
 //   { type: "dir",  path: "src" },
 //   { type: "file", path: "src/index.ts",    content: 'console.log("hello")' },
@@ -60,7 +60,7 @@ const scaffold = root(
   ),
 );
 
-await write(emit(scaffold), "./output");
+await write(await emit(scaffold), "./output");
 // Creates the full directory structure on disk
 ```
 
@@ -70,7 +70,7 @@ await write(emit(scaffold), "./output");
 const a = root(file("a.txt", "aaa"));
 const b = root(file("b.txt", "bbb"));
 
-emit(a, b);
+await emit(a, b);
 // [
 //   { type: "file", path: "a.txt", content: "aaa" },
 //   { type: "file", path: "b.txt", content: "bbb" },
@@ -81,7 +81,7 @@ emit(a, b);
 
 ```ts
 const deep = root(dir("a", dir("b", dir("c", file("x.txt", "deep")))));
-emit(deep);
+await emit(deep);
 // [
 //   { type: "dir",  path: "a" },
 //   { type: "dir",  path: "a/b" },
@@ -102,11 +102,24 @@ const node = file("greeting.txt", () => {
   return hour < 12 ? "Good morning" : "Good afternoon";
 });
 
-emit(node);
+await emit(node);
 // [{ type: "file", path: "greeting.txt", content: "Good morning" }]
 ```
 
-This is useful for dynamic content, computed values, or data from external sources. The function is only called when `emit()` runs — if you never call `emit()`, the function is never invoked.
+The function is only called when `emit()` runs — if you never call `emit()`, the function is never invoked.
+
+Content functions also support `async`/`await`:
+
+```ts
+import { emit, file } from "@ilyeshdz/ts-plate";
+
+const node = file("readme.md", async () => {
+  const response = await fetch("https://api.example.com/docs");
+  return response.text();
+});
+
+const [output] = await emit(node);
+```
 
 ### Conditional nodes
 
@@ -115,12 +128,12 @@ import { emit, root, dir, file, when } from "@ilyeshdz/ts-plate";
 
 const tree = root(
   file("index.ts"),
-  when(true, dir("types", file("types.ts"))),   // included
-  when(false, file("unused.ts")),               // skipped
-  when(() => opts.typescript, file("tsconfig.json")),  // lazy condition
+  when(true, dir("types", file("types.ts"))), // included
+  when(false, file("unused.ts")), // skipped
+  when(() => opts.typescript, file("tsconfig.json")), // lazy condition
 );
 
-emit(tree);
+const outputs = await emit(tree);
 // [
 //   { type: "file", path: "index.ts" },
 //   { type: "dir",  path: "types" },

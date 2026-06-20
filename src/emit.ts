@@ -1,17 +1,17 @@
 import type { Node, Output } from "./types";
 
-export function emit(...nodes: Node[]): Output[] {
+export async function emit(...nodes: Node[]): Promise<Output[]> {
   const outputs: Output[] = [];
 
   function join(base: string, name: string) {
     return base ? `${base}/${name}` : name;
   }
 
-  function walk(node: Node, basePath: string) {
+  async function walk(node: Node, basePath: string) {
     switch (node.type) {
       case "root":
         for (const child of node.children) {
-          walk(child, basePath);
+          await walk(child, basePath);
         }
         break;
 
@@ -20,7 +20,7 @@ export function emit(...nodes: Node[]): Output[] {
         outputs.push({ type: "dir", path: nextPath });
 
         for (const child of node.children) {
-          walk(child, nextPath);
+          await walk(child, nextPath);
         }
 
         break;
@@ -38,7 +38,7 @@ export function emit(...nodes: Node[]): Output[] {
         outputs.push({
           type: "file",
           path: join(basePath, node.name),
-          content: typeof node.content === "function" ? node.content() : node.content,
+          content: typeof node.content === "function" ? await node.content() : node.content,
         });
         break;
 
@@ -46,7 +46,7 @@ export function emit(...nodes: Node[]): Output[] {
         const pass = typeof node.condition === "function" ? node.condition() : node.condition;
         if (pass) {
           for (const child of node.children) {
-            walk(child, basePath);
+            await walk(child, basePath);
           }
         }
         break;
@@ -55,7 +55,7 @@ export function emit(...nodes: Node[]): Output[] {
   }
 
   for (const node of nodes) {
-    walk(node, "");
+    await walk(node, "");
   }
 
   return outputs;
