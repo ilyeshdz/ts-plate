@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { cp, mkdir, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import type { FileContent, Output } from "./types";
 
@@ -20,6 +20,9 @@ export async function write(outputs: Output[], basePath?: string): Promise<void>
 
     if (output.type === "dir") {
       await mkdir(fullPath, { recursive: true });
+    } else if (output.type === "copy") {
+      await mkdir(dirname(fullPath), { recursive: true });
+      await cp(output.from, fullPath);
     } else {
       await mkdir(dirname(fullPath), { recursive: true });
       const content = serializeContent(output.content);

@@ -1,4 +1,4 @@
-export type Node = RootNode | FileNode | DirectoryNode;
+export type Node = RootNode | FileNode | DirectoryNode | CopyNode;
 
 export type FileContent = string | Record<string, any>;
 
@@ -19,7 +19,13 @@ export interface RootNode {
   children: Node[];
 }
 
-export type Output = OutputFile | OutputDirectory;
+export interface CopyNode {
+  type: "copy";
+  from: string;
+  name: string;
+}
+
+export type Output = OutputFile | OutputDirectory | OutputCopy;
 
 export interface OutputFile {
   type: "file";
@@ -30,4 +36,10 @@ export interface OutputFile {
 export interface OutputDirectory {
   type: "dir";
   path: string;
+}
+
+export interface OutputCopy {
+  type: "copy";
+  path: string;
+  from: string;
 }

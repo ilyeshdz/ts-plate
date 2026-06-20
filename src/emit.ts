@@ -26,6 +26,14 @@ export function emit(...nodes: Node[]): Output[] {
         break;
       }
 
+      case "copy":
+        outputs.push({
+          type: "copy",
+          path: join(basePath, node.name),
+          from: node.from,
+        });
+        break;
+
       case "file":
         outputs.push({
           type: "file",
