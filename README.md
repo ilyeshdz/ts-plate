@@ -17,6 +17,7 @@ npm install @ilyeshdz/ts-plate
 | `root(...children)`         | Create a root container             |
 | `emit(...nodes)`            | Flatten tree(s) into output entries |
 | `write(outputs, basePath?)` | Write outputs to disk               |
+| `when(condition, ...children)` | Conditionally include nodes      |
 
 ## Usage
 
@@ -88,6 +89,28 @@ emit(deep);
 //   { type: "file", path: "a/b/c/x.txt", content: "deep" },
 // ]
 ```
+
+### Conditional nodes
+
+```ts
+import { emit, root, dir, file, when } from "@ilyeshdz/ts-plate";
+
+const tree = root(
+  file("index.ts"),
+  when(true, dir("types", file("types.ts"))),   // included
+  when(false, file("unused.ts")),               // skipped
+  when(() => opts.typescript, file("tsconfig.json")),  // lazy condition
+);
+
+emit(tree);
+// [
+//   { type: "file", path: "index.ts" },
+//   { type: "dir",  path: "types" },
+//   { type: "file", path: "types/types.ts" },
+// ]
+```
+
+The `condition` accepts a `boolean` or `() => boolean` for lazy evaluation.
 
 ## Development
 
