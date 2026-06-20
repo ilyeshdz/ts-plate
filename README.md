@@ -90,6 +90,24 @@ emit(deep);
 // ]
 ```
 
+### Lazy file content
+
+File content can be a function evaluated at emit time:
+
+```ts
+import { emit, file } from "@ilyeshdz/ts-plate";
+
+const node = file("greeting.txt", () => {
+  const hour = new Date().getHours();
+  return hour < 12 ? "Good morning" : "Good afternoon";
+});
+
+emit(node);
+// [{ type: "file", path: "greeting.txt", content: "Good morning" }]
+```
+
+This is useful for dynamic content, computed values, or data from external sources. The function is only called when `emit()` runs — if you never call `emit()`, the function is never invoked.
+
 ### Conditional nodes
 
 ```ts
