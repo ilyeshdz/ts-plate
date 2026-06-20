@@ -1,11 +1,11 @@
-# @ilyeshdz/treekit
+# @ilyeshdz/ts-plate
 
 A lightweight library for building file trees declaratively.
 
 ## Install
 
 ```bash
-npm install @ilyeshdz/treekit
+npm install @ilyeshdz/ts-plate
 ```
 
 ## API Overview
@@ -23,7 +23,7 @@ npm install @ilyeshdz/treekit
 ### Basic file tree
 
 ```ts
-import { emit, root, dir, file } from "@ilyeshdz/treekit";
+import { emit, root, dir, file } from "@ilyeshdz/ts-plate";
 
 const tree = root(
   dir("src", file("index.ts", `console.log("hello")`), dir("utils", file("helpers.ts"))),
@@ -41,7 +41,7 @@ const outputs = emit(tree);
 ### Generate a project scaffold
 
 ```ts
-import { emit, root, dir, file, write } from "@ilyeshdz/treekit";
+import { emit, root, dir, file, write } from "@ilyeshdz/ts-plate";
 
 const scaffold = root(
   dir(
