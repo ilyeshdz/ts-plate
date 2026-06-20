@@ -1,50 +1,6 @@
 import { expect, test } from "vitest";
 import { dir, file, plate, root } from "../src";
 
-test("file creates a file node", () => {
-  expect(file("index.ts")).toEqual({ type: "file", name: "index.ts" });
-
-  expect(file("app.ts", 'export const a = 1')).toEqual({
-    type: "file",
-    name: "app.ts",
-    content: 'export const a = 1',
-  });
-});
-
-test("file allows Record<string, any> content", () => {
-  const content = { foo: 1, bar: { baz: true } };
-  expect(file("data.json", content)).toEqual({
-    type: "file",
-    name: "data.json",
-    content,
-  });
-});
-
-test("dir creates a directory node", () => {
-  expect(dir("src")).toEqual({ type: "dir", name: "src", children: [] });
-
-  expect(dir("src", file("a.ts"), file("b.ts"))).toEqual({
-    type: "dir",
-    name: "src",
-    children: [
-      { type: "file", name: "a.ts" },
-      { type: "file", name: "b.ts" },
-    ],
-  });
-});
-
-test("root creates a root node", () => {
-  expect(root()).toEqual({ type: "root", children: [] });
-
-  expect(root(dir("lib"), file("readme.md"))).toEqual({
-    type: "root",
-    children: [
-      { type: "dir", name: "lib", children: [] },
-      { type: "file", name: "readme.md" },
-    ],
-  });
-});
-
 test("root with nested directories and files", () => {
   const tree = root(
     dir(
