@@ -30,7 +30,10 @@
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "fmt": "oxfmt",
-    "fmt:check": "oxfmt --check"
+    "fmt:check": "oxfmt --check",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
   },
   "devDependencies": {
     "@types/node": "^25.6.2",
@@ -41,6 +44,7 @@
     "oxlint": "^1.70.0",
     "tsdown": "^0.22.0",
     "typescript": "^6.0.3",
+    "vitepress": "2.0.0-alpha.17",
     "vitest": "^4.1.5"
   }
 }
