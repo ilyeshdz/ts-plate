@@ -20,7 +20,7 @@ Most generator tools ask you to learn a second way of thinking. They ship a temp
 - inspect the result before it hits disk
 - stay fully in control of how your tool behaves
 
-That makes it a good fit for teams building custom CLIs, code generators, project starters, and systems like Bitpress that need a small but serious foundation underneath them.
+That makes it a good fit for teams building custom CLIs, code generators, or project starters that need a small but serious foundation underneath them.
 
 If you want a ready-made `npx ...` experience, this is probably not the right package. If you want a minimal library that lets you build that experience yourself, this is exactly the point.
 

@@ -91,7 +91,7 @@ ts-plate is a strong fit when you want:
 - a small library that stays out of the way
 - outputs you can inspect before writing
 - code that looks like code, not a template dialect
-- a foundation for tools like Bitpress, custom CLIs, or internal scaffolding systems
+- a foundation for custom CLIs, code generators, or internal scaffolding systems
 
 ## When it is not
 

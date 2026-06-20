@@ -33,7 +33,7 @@ features:
 
 ts-plate is the kind of library you reach for when the generator itself matters.
 
-It is not trying to be the whole product. It is trying to be the clean, dependable layer underneath the product you actually want to ship. If you are building a CLI, a project starter, a code generation workflow, or something larger like Bitpress, ts-plate gives you the file-tree machinery without the baggage.
+It is not trying to be the whole product. It is trying to be the clean, dependable layer underneath the product you actually want to ship. If you are building a CLI, a project starter, or a code generation workflow, ts-plate gives you the file-tree machinery without the baggage.
 
 ```ts
 import { root, dir, file, when, emit } from "@ilyeshdz/ts-plate";
