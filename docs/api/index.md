@@ -14,10 +14,10 @@ file(name: string, content?: FileContent | FileContentFn): FileNode
 - `content` — optional. Can be a `string`, a JSON-serializable `Record<string, any>`, a sync function `() => FileContent`, or an async function `() => Promise<FileContent>`. If omitted, the file is created empty.
 
 ```ts
-file("readme.md", "# Hello")
-file("package.json", { name: "example" })    // serialized as JSON on write
-file("time.txt", () => new Date().toISOString()) // lazy
-file("data.json", async () => fetch(url).then(r => r.json())) // async lazy
+file("readme.md", "# Hello");
+file("package.json", { name: "example" }); // serialized as JSON on write
+file("time.txt", () => new Date().toISOString()); // lazy
+file("data.json", async () => fetch(url).then((r) => r.json())); // async lazy
 ```
 
 ---
@@ -34,9 +34,9 @@ Directories appear before their children in the emitted output. Empty directorie
 produce no children but still appear as a `{ type: "dir", path }` entry.
 
 ```ts
-dir("src")
-dir("src", file("index.ts"))
-dir("components", dir("ui", file("Button.tsx")))
+dir("src");
+dir("src", file("index.ts"));
+dir("components", dir("ui", file("Button.tsx")));
 ```
 
 ---
@@ -51,14 +51,14 @@ root(...children: Node[]): RootNode
 ```
 
 ```ts
-root(file("a.txt"), file("b.txt"))
-root(dir("src"), dir("tests"))
+root(file("a.txt"), file("b.txt"));
+root(dir("src"), dir("tests"));
 ```
 
 Multiple roots can be passed to `emit()`:
 
 ```ts
-emit(root(file("a.txt")), root(file("b.txt")))
+emit(root(file("a.txt")), root(file("b.txt")));
 ```
 
 ---
@@ -75,9 +75,9 @@ when(condition: Condition, ...children: Node[]): ConditionalNode
 children are excluded from the output entirely — they're not even evaluated.
 
 ```ts
-when(true, file("always.txt"))
-when(false, file("never.txt"))                          // skipped
-when(() => process.env.DEBUG, file("debug.log"))         // lazy
+when(true, file("always.txt"));
+when(false, file("never.txt")); // skipped
+when(() => process.env.DEBUG, file("debug.log")); // lazy
 ```
 
 ---
@@ -94,8 +94,8 @@ copy(from: string, name: string): CopyNode
 The actual file copy happens during `write()`.
 
 ```ts
-copy("/absolute/path/to/license.txt", "LICENSE")
-copy("../shared/template.ts", "src/template.ts")
+copy("/absolute/path/to/license.txt", "LICENSE");
+copy("../shared/template.ts", "src/template.ts");
 ```
 
 ---
@@ -116,9 +116,7 @@ emit(...nodes: Node[]): Promise<Output[]>
 - Returns a flat array
 
 ```ts
-const outputs = await emit(
-  root(dir("src", file("index.ts", ""))),
-);
+const outputs = await emit(root(dir("src", file("index.ts", ""))));
 // [{ type: "dir", path: "src" }, { type: "file", path: "src/index.ts", content: "" }]
 ```
 
@@ -138,9 +136,9 @@ write(outputs: Output[], basePath?: string): Promise<void>
 - Default `basePath` is `process.cwd()`
 
 ```ts
-await write(outputs)              // writes to cwd
-await write(outputs, "./dist")    // writes to ./dist
-await write(outputs, "/tmp/app")  // writes to absolute path
+await write(outputs); // writes to cwd
+await write(outputs, "./dist"); // writes to ./dist
+await write(outputs, "/tmp/app"); // writes to absolute path
 ```
 
 ---
@@ -157,10 +155,7 @@ Returns the same outputs that `emit()` produces, so you can inspect what was
 written.
 
 ```ts
-const outputs = await render(
-  root(dir("out", file("index.html", "<h1>Hi</h1>"))),
-  "./build",
-);
+const outputs = await render(root(dir("out", file("index.html", "<h1>Hi</h1>"))), "./build");
 // Files on disk, outputs returned
 ```
 
@@ -169,58 +164,58 @@ const outputs = await render(
 ## Types
 
 ```ts
-type Node = RootNode | FileNode | DirectoryNode | CopyNode | ConditionalNode
+type Node = RootNode | FileNode | DirectoryNode | CopyNode | ConditionalNode;
 
-type Condition = boolean | (() => boolean)
+type Condition = boolean | (() => boolean);
 
-type FileContent = string | Record<string, any>
-type FileContentFn = () => FileContent | Promise<FileContent>
+type FileContent = string | Record<string, any>;
+type FileContentFn = () => FileContent | Promise<FileContent>;
 
 interface FileNode {
-  type: "file"
-  name: string
-  content?: FileContent | FileContentFn
+  type: "file";
+  name: string;
+  content?: FileContent | FileContentFn;
 }
 
 interface DirectoryNode {
-  type: "dir"
-  name: string
-  children: Node[]
+  type: "dir";
+  name: string;
+  children: Node[];
 }
 
 interface RootNode {
-  type: "root"
-  children: Node[]
+  type: "root";
+  children: Node[];
 }
 
 interface CopyNode {
-  type: "copy"
-  from: string
-  name: string
+  type: "copy";
+  from: string;
+  name: string;
 }
 
 interface ConditionalNode {
-  type: "conditional"
-  condition: Condition
-  children: Node[]
+  type: "conditional";
+  condition: Condition;
+  children: Node[];
 }
 
-type Output = OutputFile | OutputDirectory | OutputCopy
+type Output = OutputFile | OutputDirectory | OutputCopy;
 
 interface OutputFile {
-  type: "file"
-  path: string
-  content?: FileContent
+  type: "file";
+  path: string;
+  content?: FileContent;
 }
 
 interface OutputDirectory {
-  type: "dir"
-  path: string
+  type: "dir";
+  path: string;
 }
 
 interface OutputCopy {
-  type: "copy"
-  path: string
-  from: string
+  type: "copy";
+  path: string;
+  from: string;
 }
 ```

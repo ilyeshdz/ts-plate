@@ -10,7 +10,8 @@ Wrap a tree in a function and reuse it across projects:
 import { dir, file, type Node } from "@ilyeshdz/ts-plate";
 
 function nodePackage(name: string): Node {
-  return dir(name,
+  return dir(
+    name,
     file("package.json", {
       name,
       version: "0.0.1",
@@ -51,22 +52,17 @@ interface ScaffoldOptions {
 
 async function scaffold(opts: ScaffoldOptions) {
   const tree = root(
-    dir(opts.name,
+    dir(
+      opts.name,
       file("README.md", `# ${opts.name}\n\nA project.`),
       file("package.json", {
         name: opts.name,
         version: "0.1.0",
         type: "module",
-        scripts: opts.tests
-          ? { build: "tsc", test: "vitest" }
-          : { build: "tsc" },
+        scripts: opts.tests ? { build: "tsc", test: "vitest" } : { build: "tsc" },
       }),
-      dir("src",
-        file(opts.typescript ? "index.ts" : "index.js", ""),
-      ),
-      when(opts.tests,
-        dir("tests", file("index.test.ts", "")),
-      ),
+      dir("src", file(opts.typescript ? "index.ts" : "index.js", "")),
+      when(opts.tests, dir("tests", file("index.test.ts", ""))),
     ),
   );
 
@@ -83,12 +79,7 @@ Inspect what would be written before writing:
 ```ts
 import { emit, root, dir, file } from "@ilyeshdz/ts-plate";
 
-const tree = root(
-  dir("output",
-    file("data.txt", "hello"),
-    file("config.json", { debug: true }),
-  ),
-);
+const tree = root(dir("output", file("data.txt", "hello"), file("config.json", { debug: true })));
 
 const outputs = await emit(tree);
 
@@ -110,7 +101,8 @@ Generate files whose content comes from an external source:
 import { root, dir, file, emit, write } from "@ilyeshdz/ts-plate";
 
 const tree = root(
-  dir("docs",
+  dir(
+    "docs",
     file("readme.md", async () => {
       const res = await fetch("https://api.github.com/repos/user/project/readme");
       const data = await res.json();
@@ -135,10 +127,7 @@ const configFiles = root(
   file(".npmrc", "registry=https://registry.npmjs.org/"),
 );
 
-const sourceFiles = root(
-  dir("src", file("index.ts")),
-  dir("tests"),
-);
+const sourceFiles = root(dir("src", file("index.ts")), dir("tests"));
 
 // Combine both trees
 const allOutputs = await emit(configFiles, sourceFiles);
@@ -169,7 +158,8 @@ rl.close();
 
 const outputs = await render(
   root(
-    dir(name,
+    dir(
+      name,
       file("README.md", `# ${name}`),
       file("package.json", {
         name,
@@ -178,12 +168,8 @@ const outputs = await render(
         devDependencies: useTs ? { typescript: "^5.0.0" } : {},
       }),
       when(useTs, file("tsconfig.json", { compilerOptions: { strict: true } })),
-      when(includeTests,
-        dir("tests", file("index.test.ts", "")),
-      ),
-      dir("src",
-        file(useTs ? "index.ts" : "index.js", ""),
-      ),
+      when(includeTests, dir("tests", file("index.test.ts", ""))),
+      dir("src", file(useTs ? "index.ts" : "index.js", "")),
     ),
   ),
 );
@@ -202,13 +188,13 @@ const tree = root(dir("build", file("output.txt", "data")));
 let outputs = await emit(tree);
 
 // Prepend a base path to all outputs
-outputs = outputs.map(o => ({
+outputs = outputs.map((o) => ({
   ...o,
   path: `project-${Date.now()}/${o.path}`,
 }));
 
 // Filter out empty directories
-outputs = outputs.filter(o => o.type !== "dir");
+outputs = outputs.filter((o) => o.type !== "dir");
 
 await write(outputs);
 ```

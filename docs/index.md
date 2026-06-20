@@ -29,16 +29,17 @@ features:
 ---
 
 ```ts
-import { root, dir, file, emit } from "@ilyeshdz/ts-plate"
+import { root, dir, file, emit } from "@ilyeshdz/ts-plate";
 
 const tree = root(
-  dir("src",
+  dir(
+    "src",
     file("index.ts", `export const add = (a: number, b: number) => a + b`),
     dir("utils", file("helpers.ts")),
   ),
-)
+);
 
-const outputs = await emit(tree)
+const outputs = await emit(tree);
 // [
 //   { type: "dir",  path: "src" },
 //   { type: "file", path: "src/index.ts",     content: "export const add = ..." },

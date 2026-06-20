@@ -1,8 +1,8 @@
 # Why ts-plate?
 
 There are a lot of file scaffolding tools out there. I tried most of them, and
-they all left me with the same feeling: *why does this have to be so
-complicated?*
+they all left me with the same feeling: _why does this have to be so
+complicated?_
 
 ## The template problem
 
@@ -30,7 +30,8 @@ But with ts-plate, composition is the entire point:
 
 ```ts
 function generateReactComponent(name: string) {
-  return dir(name,
+  return dir(
+    name,
     file(`${name}.tsx`, componentTemplate(name)),
     file(`${name}.test.tsx`, testTemplate(name)),
     file(`${name}.css`, ""),
@@ -38,7 +39,8 @@ function generateReactComponent(name: string) {
 }
 
 const app = root(
-  dir("src",
+  dir(
+    "src",
     generateReactComponent("Button"),
     generateReactComponent("Card"),
     generateReactComponent("Modal"),
@@ -54,7 +56,7 @@ When do templates get evaluated? During generation, sure — but what if you wan
 to generate content that depends on the current time, an API response, or a
 random value?
 
-In ts-plate, file content can be a function that runs *at emit time*, not at
+In ts-plate, file content can be a function that runs _at emit time_, not at
 tree-build time. This means you can create lazy content that only evaluates
 when someone actually calls `emit()`:
 
@@ -69,14 +71,14 @@ run.
 
 ## How it compares
 
-|                            | ts-plate | Yeoman / Plop | scaffdog | Degit |
-|----------------------------|----------|---------------|----------|-------|
-| Template language          | None     | EJS / Handlebars | Markdown | None |
-| CLI                        | No       | Yes           | Yes      | Yes   |
-| Runtime dependencies       | 0        | Many          | Minimal  | Minimal |
-| Lazy content               | Built-in | Via templates | Via templates | N/A |
-| Composition via functions  | Yes      | Limited       | Limited  | No    |
-| Tree + flat representation | Yes      | No            | No       | No    |
+|                            | ts-plate | Yeoman / Plop    | scaffdog      | Degit   |
+| -------------------------- | -------- | ---------------- | ------------- | ------- |
+| Template language          | None     | EJS / Handlebars | Markdown      | None    |
+| CLI                        | No       | Yes              | Yes           | Yes     |
+| Runtime dependencies       | 0        | Many             | Minimal       | Minimal |
+| Lazy content               | Built-in | Via templates    | Via templates | N/A     |
+| Composition via functions  | Yes      | Limited          | Limited       | No      |
+| Tree + flat representation | Yes      | No               | No            | No      |
 
 ## When NOT to use ts-plate
 
@@ -85,7 +87,7 @@ ts-plate is a library, not a CLI tool. You won't run `npx ts-plate init my-app`
 be happier with [Plop](https://plopjs.com/) or
 [degit](https://github.com/Rich-Harris/degit).
 
-But if you're building a tool that *generates files* — a CLI of your own, a
+But if you're building a tool that _generates files_ — a CLI of your own, a
 project initializer, a code generator for your framework — ts-plate is the
 engine under the hood. It does one thing (tree → flat outputs → disk) and does
 it without getting in your way.

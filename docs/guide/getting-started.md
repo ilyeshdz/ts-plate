@@ -56,13 +56,13 @@ Real projects have folders. `dir()` creates one, and you nest children inside it
 import { root, dir, file, emit } from "@ilyeshdz/ts-plate";
 
 const tree = root(
-  dir("project",
+  dir(
+    "project",
     file("README.md", "# My Project"),
-    dir("src",
+    dir(
+      "src",
       file("index.ts", `console.log("hello")`),
-      dir("utils",
-        file("math.ts", `export const add = (a, b) => a + b`),
-      ),
+      dir("utils", file("math.ts", `export const add = (a, b) => a + b`)),
     ),
   ),
 );
@@ -93,10 +93,7 @@ If you just want to emit and write in one step, use `render()`:
 ```ts
 import { render, root, dir, file } from "@ilyeshdz/ts-plate";
 
-const outputs = await render(
-  root(dir("project", file("index.ts", `console.log("hi")`))),
-  "./out",
-);
+const outputs = await render(root(dir("project", file("index.ts", `console.log("hi")`))), "./out");
 
 // Files are on disk, and outputs are still returned for inspection
 ```

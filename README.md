@@ -16,10 +16,7 @@ npm install @ilyeshdz/ts-plate
 import { emit, root, dir, file } from "@ilyeshdz/ts-plate";
 
 const tree = root(
-  dir("src",
-    file("index.ts", `console.log("hello")`),
-    dir("utils", file("helpers.ts")),
-  ),
+  dir("src", file("index.ts", `console.log("hello")`), dir("utils", file("helpers.ts"))),
 );
 
 const outputs = await emit(tree);
