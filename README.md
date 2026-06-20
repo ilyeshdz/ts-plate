@@ -1,11 +1,11 @@
-# ts-plate
+# @ilyeshdz/ts-plate
 
 A lightweight library for building file trees declaratively.
 
 ## Install
 
 ```bash
-npm install ts-plate
+npm install @ilyeshdz/ts-plate
 ```
 
 ## API Overview
@@ -23,7 +23,7 @@ npm install ts-plate
 ### Basic file tree
 
 ```ts
-import { plate, root, dir, file } from "ts-plate";
+import { plate, root, dir, file } from "@ilyeshdz/ts-plate";
 
 const tree = root(
   dir("src", file("index.ts", `console.log("hello")`), dir("utils", file("helpers.ts"))),
@@ -41,7 +41,7 @@ const outputs = plate(tree);
 ### Generate a project scaffold
 
 ```ts
-import { plate, root, dir, file, write } from "ts-plate";
+import { plate, root, dir, file, write } from "@ilyeshdz/ts-plate";
 
 const scaffold = root(
   dir(
