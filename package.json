@@ -33,12 +33,14 @@
     "fmt:check": "oxfmt --check",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
-    "docs:preview": "vitepress preview docs"
+    "docs:preview": "vitepress preview docs",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@types/node": "^25.6.2",
     "@typescript/native-preview": "7.0.0-dev.20260509.2",
     "bumpp": "^11.1.0",
+    "husky": "^9.1.7",
     "memfs": "^4.57.7",
     "oxfmt": "^0.55.0",
     "oxlint": "^1.70.0",

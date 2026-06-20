@@ -32,14 +32,7 @@ function component(name: string) {
   );
 }
 
-const app = root(
-  dir(
-    "src",
-    component("Button"),
-    component("Card"),
-    component("Modal"),
-  ),
-);
+const app = root(dir("src", component("Button"), component("Card"), component("Modal")));
 ```
 
 That style is not a special plugin or framework trick. It is just ordinary functions returning ordinary data.

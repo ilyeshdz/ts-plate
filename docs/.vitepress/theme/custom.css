@@ -6,7 +6,8 @@
 
   --vp-home-hero-name-color: #0f766e;
   --vp-home-hero-name-background: linear-gradient(120deg, #0f766e 0%, #0ea5e9 100%);
-  --vp-home-hero-image-background-image: radial-gradient(circle at top left, rgba(14, 165, 233, 0.2), transparent 42%),
+  --vp-home-hero-image-background-image:
+    radial-gradient(circle at top left, rgba(14, 165, 233, 0.2), transparent 42%),
     radial-gradient(circle at bottom right, rgba(15, 118, 110, 0.14), transparent 36%);
   --vp-home-hero-image-filter: blur(50px);
   --vp-font-family-base: "Inter", ui-sans-serif, system-ui, sans-serif;

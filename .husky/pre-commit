@@ -1,0 +1,2 @@
+pnpm fmt
+git add -A

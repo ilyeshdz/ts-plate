@@ -104,7 +104,10 @@ If you want the common path in one step, use `render()`:
 ```ts
 import { render, root, dir, file } from "@ilyeshdz/ts-plate";
 
-const outputs = await render([root(dir("project", file("index.ts", `console.log("hi")`)))], "./out");
+const outputs = await render(
+  [root(dir("project", file("index.ts", `console.log("hi")`)))],
+  "./out",
+);
 ```
 
 ## Lazy content

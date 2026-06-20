@@ -74,7 +74,10 @@ If your workflow is simply "build then write", `render()` does both:
 ```ts
 import { render, root, dir, file } from "@ilyeshdz/ts-plate";
 
-const outputs = await render([root(dir("project", file("index.ts", `console.log("hi")`)))], "./out");
+const outputs = await render(
+  [root(dir("project", file("index.ts", `console.log("hi")`)))],
+  "./out",
+);
 ```
 
 You still get the emitted outputs back, which means the operation remains inspectable even when the filesystem has already been updated.
