@@ -27,9 +27,7 @@ test("emit with a copy node at root level", () => {
 });
 
 test("emit with a copy node nested inside a directory", () => {
-  const tree = root(
-    dir("src", copy("/source/app.ts", "app.ts")),
-  );
+  const tree = root(dir("src", copy("/source/app.ts", "app.ts")));
 
   expect(emit(tree)).toEqual([
     { type: "dir", path: "src" },
@@ -61,12 +59,12 @@ test("write copies a file from source to destination", async () => {
 });
 
 test("write copies a file into a nested directory", async () => {
-  fs.writeFileSync("/source.js", 'export const x = 1');
+  fs.writeFileSync("/source.js", "export const x = 1");
 
   await write([{ type: "copy", path: "src/lib/util.js", from: "/source.js" }], "/");
 
   expect(fs.statSync("/src/lib").isDirectory()).toBe(true);
-  expect(fs.readFileSync("/src/lib/util.js", "utf-8")).toBe('export const x = 1');
+  expect(fs.readFileSync("/src/lib/util.js", "utf-8")).toBe("export const x = 1");
 });
 
 test("write with copy alongside files and directories", async () => {

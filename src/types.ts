@@ -1,4 +1,6 @@
-export type Node = RootNode | FileNode | DirectoryNode | CopyNode;
+export type Node = RootNode | FileNode | DirectoryNode | CopyNode | ConditionalNode;
+
+export type Condition = boolean | (() => boolean);
 
 export type FileContent = string | Record<string, any>;
 export type FileContentFn = () => FileContent;
@@ -24,6 +26,12 @@ export interface CopyNode {
   type: "copy";
   from: string;
   name: string;
+}
+
+export interface ConditionalNode {
+  type: "conditional";
+  condition: Condition;
+  children: Node[];
 }
 
 export type Output = OutputFile | OutputDirectory | OutputCopy;

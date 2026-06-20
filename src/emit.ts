@@ -41,6 +41,16 @@ export function emit(...nodes: Node[]): Output[] {
           content: typeof node.content === "function" ? node.content() : node.content,
         });
         break;
+
+      case "conditional": {
+        const pass = typeof node.condition === "function" ? node.condition() : node.condition;
+        if (pass) {
+          for (const child of node.children) {
+            walk(child, basePath);
+          }
+        }
+        break;
+      }
     }
   }
 
