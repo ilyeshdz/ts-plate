@@ -1,5 +1,5 @@
 {
-  "name": "treekit",
+  "name": "@ilyeshdz/treekit",
   "version": "0.1.5",
   "description": "A lightweight library for building file trees declaratively.",
   "homepage": "https://github.com/ilyeshdz/ts-plate#readme",
