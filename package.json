@@ -1,7 +1,7 @@
 {
   "name": "ts-plate",
   "version": "0.1.3",
-  "description": "A starter for creating a TypeScript package.",
+  "description": "A lightweight library for building file trees declaratively.",
   "homepage": "https://github.com/ilyeshdz/ts-plate#readme",
   "bugs": {
     "url": "https://github.com/ilyeshdz/ts-plate/issues"
