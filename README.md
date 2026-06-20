@@ -15,7 +15,7 @@ npm install treekit
 | `file(name, content?)`      | Create a file node                  |
 | `dir(name, ...children)`    | Create a directory node             |
 | `root(...children)`         | Create a root container             |
-| `plate(...nodes)`           | Flatten tree(s) into output entries |
+| `emit(...nodes)`            | Flatten tree(s) into output entries |
 | `write(outputs, basePath?)` | Write outputs to disk               |
 
 ## Usage
@@ -23,13 +23,13 @@ npm install treekit
 ### Basic file tree
 
 ```ts
-import { plate, root, dir, file } from "treekit";
+import { emit, root, dir, file } from "treekit";
 
 const tree = root(
   dir("src", file("index.ts", `console.log("hello")`), dir("utils", file("helpers.ts"))),
 );
 
-const outputs = plate(tree);
+const outputs = emit(tree);
 // [
 //   { type: "dir",  path: "src" },
 //   { type: "file", path: "src/index.ts",    content: 'console.log("hello")' },
@@ -41,7 +41,7 @@ const outputs = plate(tree);
 ### Generate a project scaffold
 
 ```ts
-import { plate, root, dir, file, write } from "treekit";
+import { emit, root, dir, file, write } from "treekit";
 
 const scaffold = root(
   dir(
@@ -59,7 +59,7 @@ const scaffold = root(
   ),
 );
 
-await write(plate(scaffold), "./output");
+await write(emit(scaffold), "./output");
 // Creates the full directory structure on disk
 ```
 
@@ -69,7 +69,7 @@ await write(plate(scaffold), "./output");
 const a = root(file("a.txt", "aaa"));
 const b = root(file("b.txt", "bbb"));
 
-plate(a, b);
+emit(a, b);
 // [
 //   { type: "file", path: "a.txt", content: "aaa" },
 //   { type: "file", path: "b.txt", content: "bbb" },
@@ -80,7 +80,7 @@ plate(a, b);
 
 ```ts
 const deep = root(dir("a", dir("b", dir("c", file("x.txt", "deep")))));
-plate(deep);
+emit(deep);
 // [
 //   { type: "dir",  path: "a" },
 //   { type: "dir",  path: "a/b" },

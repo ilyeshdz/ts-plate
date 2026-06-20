@@ -1,6 +1,6 @@
 import type { Node, Output } from "./types";
 
-export function plate(...nodes: Node[]): Output[] {
+export function emit(...nodes: Node[]): Output[] {
   const outputs: Output[] = [];
 
   function join(base: string, name: string) {
