@@ -1,11 +1,12 @@
 {
   "name": "@ilyeshdz/ts-plate",
-  "version": "0.1.6",
+  "version": "0.2.0",
   "description": "A lightweight library for building file trees declaratively.",
   "homepage": "https://github.com/ilyeshdz/ts-plate#readme",
   "bugs": {
     "url": "https://github.com/ilyeshdz/ts-plate/issues"
   },
+  "private": false,
   "license": "MIT",
   "author": "Ilyes Hernandez <hdz.ilyes@gmail.com>",
   "repository": {
