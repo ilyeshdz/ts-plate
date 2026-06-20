@@ -1,11 +1,12 @@
 export type Node = RootNode | FileNode | DirectoryNode | CopyNode;
 
 export type FileContent = string | Record<string, any>;
+export type FileContentFn = () => FileContent;
 
 export interface FileNode {
   type: "file";
   name: string;
-  content?: FileContent;
+  content?: FileContent | FileContentFn;
 }
 
 export interface DirectoryNode {

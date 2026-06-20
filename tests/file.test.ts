@@ -19,3 +19,11 @@ test("file allows Record<string, any> content", () => {
     content,
   });
 });
+
+test("file accepts a function as content", () => {
+  const fn = () => "dynamic";
+  const node = file("name.ts", fn);
+  expect(node.type).toBe("file");
+  expect(node.name).toBe("name.ts");
+  expect(node.content).toBe(fn);
+});

@@ -1,6 +1,6 @@
-import type { FileContent, FileNode } from "./types";
+import type { FileContent, FileContentFn, FileNode } from "./types";
 
-export function file(name: string, content?: FileContent): FileNode {
+export function file(name: string, content?: FileContent | FileContentFn): FileNode {
   return {
     type: "file",
     name,

@@ -81,3 +81,16 @@ test("JSON object content is preserved", () => {
     { type: "file", path: "package.json", content: pkg },
   ]);
 });
+
+test("file with function content is evaluated at emit time", () => {
+  expect(emit(file("name.ts", () => "evaluated content"))).toEqual([
+    { type: "file", path: "name.ts", content: "evaluated content" },
+  ]);
+});
+
+test("file with function returning object content", () => {
+  const obj = { key: "value" };
+  expect(emit(file("data.json", () => obj))).toEqual([
+    { type: "file", path: "data.json", content: obj },
+  ]);
+});

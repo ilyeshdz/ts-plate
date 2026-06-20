@@ -38,7 +38,7 @@ export function emit(...nodes: Node[]): Output[] {
         outputs.push({
           type: "file",
           path: join(basePath, node.name),
-          content: node.content,
+          content: typeof node.content === "function" ? node.content() : node.content,
         });
         break;
     }
