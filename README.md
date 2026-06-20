@@ -10,14 +10,15 @@ npm install @ilyeshdz/ts-plate
 
 ## API Overview
 
-| Function                       | Description                         |
-| ------------------------------ | ----------------------------------- |
-| `file(name, content?)`         | Create a file node                  |
-| `dir(name, ...children)`       | Create a directory node             |
-| `root(...children)`            | Create a root container             |
-| `emit(...nodes)`               | Flatten tree(s) into output entries |
-| `write(outputs, basePath?)`    | Write outputs to disk               |
-| `when(condition, ...children)` | Conditionally include nodes         |
+| Function                       | Description                                |
+| ------------------------------ | ------------------------------------------ |
+| `file(name, content?)`         | Create a file node                         |
+| `dir(name, ...children)`       | Create a directory node                    |
+| `root(...children)`            | Create a root container                    |
+| `emit(...nodes)`               | Flatten tree(s) into output entries        |
+| `write(outputs, basePath?)`    | Write outputs to disk                      |
+| `render(nodes, basePath?)`     | Emit tree(s) and write to disk in one call |
+| `when(condition, ...children)` | Conditionally include nodes                |
 
 ## Usage
 
@@ -142,6 +143,20 @@ const outputs = await emit(tree);
 ```
 
 The `condition` accepts a `boolean` or `() => boolean` for lazy evaluation.
+
+### Emit and write in one call
+
+```ts
+import { render, root, dir, file } from "@ilyeshdz/ts-plate";
+
+const outputs = await render(
+  root(dir("project", file("index.ts", 'console.log("hello")'), file("readme.md", "# Project"))),
+  "./output",
+);
+
+// Files written to disk, outputs returned for inspection
+// outputs: [{ type: "dir", path: "project" }, ...]
+```
 
 ## Development
 
