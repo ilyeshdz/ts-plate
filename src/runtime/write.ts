@@ -1,6 +1,7 @@
 import { access, cp, mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
-import type { FileContent, FileStrategy, Output } from "./types";
+import { ConflictError, ValidationError } from "../errors";
+import type { FileContent, FileStrategy, Output } from "../types";
 
 function serializeContent(content: FileContent | undefined): string {
   if (content === undefined) {
@@ -58,14 +59,16 @@ export async function write(outputs: Output[], basePath?: string): Promise<void>
       }
 
       if (strategy === "error" && exists) {
-        throw new Error(`File already exists: ${output.path}`);
+        throw new ConflictError(`File already exists: ${output.path}`);
       }
 
       if (strategy === "merge" && exists) {
         const generated = output.content;
 
         if (!isPlainObject(generated)) {
-          throw new Error(`Cannot merge "${output.path}": generated content must be a JSON object`);
+          throw new ValidationError(
+            `Cannot merge "${output.path}": generated content must be a JSON object`,
+          );
         }
 
         const existingRaw = await readFile(fullPath, "utf-8");
@@ -73,11 +76,15 @@ export async function write(outputs: Output[], basePath?: string): Promise<void>
         try {
           existing = JSON.parse(existingRaw);
         } catch {
-          throw new Error(`Cannot merge "${output.path}": existing file is not valid JSON`);
+          throw new ValidationError(
+            `Cannot merge "${output.path}": existing file is not valid JSON`,
+          );
         }
 
         if (!isPlainObject(existing)) {
-          throw new Error(`Cannot merge "${output.path}": existing content must be a JSON object`);
+          throw new ValidationError(
+            `Cannot merge "${output.path}": existing content must be a JSON object`,
+          );
         }
 
         const merged = deepMerge(existing, generated);

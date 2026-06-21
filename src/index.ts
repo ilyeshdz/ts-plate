@@ -1,9 +1,10 @@
-export { copy } from "./copy";
-export { dir } from "./dir";
-export { file } from "./file";
-export { root } from "./root";
-export { emit } from "./emit";
-export { render } from "./render";
-export { when } from "./when";
-export { write } from "./write";
+export { copy } from "./nodes/copy";
+export { dir } from "./nodes/dir";
+export { file } from "./nodes/file";
+export { root } from "./nodes/root";
+export { when } from "./nodes/when";
+export { emit } from "./runtime/emit";
+export { render } from "./runtime/render";
+export { write } from "./runtime/write";
+export { TsPlateError, ValidationError, ConflictError } from "./errors";
 export type * from "./types";

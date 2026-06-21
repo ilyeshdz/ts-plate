@@ -1,4 +1,4 @@
-import type { Node } from "./types";
+import type { Node } from "../types";
 
 export function normalizeChildren(children: (Node | Node[])[]): Node[] {
   const result: Node[] = [];

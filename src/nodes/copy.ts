@@ -1,4 +1,4 @@
-import type { CopyDirNode, CopyDirOptions, CopyNode, Node } from "./types";
+import type { CopyDirNode, CopyDirOptions, CopyNode, Node } from "../types";
 
 export function copy(from: string, name: string): CopyNode;
 export function copy(from: string, options?: CopyDirOptions): CopyDirNode;

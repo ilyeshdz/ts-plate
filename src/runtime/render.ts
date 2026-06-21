@@ -1,4 +1,4 @@
-import type { Node, Output } from "./types";
+import type { Node, Output } from "../types";
 import { emit } from "./emit";
 import { write } from "./write";
 

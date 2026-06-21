@@ -5,7 +5,7 @@ import type {
   FileNode,
   FileOptions,
   FileStrategy,
-} from "./types";
+} from "../types";
 
 export function file(
   name: FileName,

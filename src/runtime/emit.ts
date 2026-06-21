@@ -1,5 +1,6 @@
 import { readdir } from "node:fs/promises";
-import type { CopyDirOptions, FileName, Node, Output, OutputFile } from "./types";
+import { ValidationError } from "../errors";
+import type { CopyDirOptions, FileName, Node, Output, OutputFile } from "../types";
 
 export async function emit(...nodes: Node[]): Promise<Output[]> {
   const outputs: Output[] = [];
@@ -14,17 +15,17 @@ export async function emit(...nodes: Node[]): Promise<Output[]> {
 
   function validateFileName(name: string): void {
     if (name.trim().length === 0) {
-      throw new Error(`Invalid filename: "${name}". Filename must not be empty.`);
+      throw new ValidationError(`Invalid filename: "${name}". Filename must not be empty.`);
     }
 
     if (name.split("/").includes("..")) {
-      throw new Error(
+      throw new ValidationError(
         `Invalid filename: "${name}". Filename must not traverse outside the target directory.`,
       );
     }
 
     if (name.startsWith("/")) {
-      throw new Error(
+      throw new ValidationError(
         `Invalid filename: "${name}". Absolute paths are not allowed. Use a relative path instead.`,
       );
     }
