@@ -47,7 +47,7 @@ test("overwrite, skip, and error strategies", async () => {
       [{ type: "file" as const, path: "exists.txt", content: "new", strategy: "error" as const }],
       "/",
     ),
-  ).rejects.toThrow("File already exists");
+  ).rejects.toThrow("file already exists and strategy is 'error'");
 
   // error writes when file does not exist
   await write(
@@ -91,7 +91,7 @@ test("merge strategy", async () => {
       ],
       "/",
     ),
-  ).rejects.toThrow("generated content must be a JSON object");
+  ).rejects.toThrow("generated content must be a plain JSON object");
 
   // error: non-JSON existing file
   fs.writeFileSync("/data.txt", "not json");
@@ -107,7 +107,7 @@ test("merge strategy", async () => {
       ],
       "/",
     ),
-  ).rejects.toThrow("existing file is not valid JSON");
+  ).rejects.toThrow("existing file contains invalid JSON");
 });
 
 test("conflict strategies work through render end-to-end", async () => {
@@ -125,5 +125,5 @@ test("conflict strategies work through render end-to-end", async () => {
   fs.writeFileSync("/conflict.txt", "existing");
   await expect(
     render([root(file("conflict.txt", "new", { strategy: "error" }))], "/"),
-  ).rejects.toThrow("File already exists");
+  ).rejects.toThrow("file already exists and strategy is 'error'");
 });

@@ -6,5 +6,5 @@ export { when } from "./nodes/when";
 export { emit } from "./runtime/emit";
 export { render } from "./runtime/render";
 export { write } from "./runtime/write";
-export { TsPlateError, ValidationError, ConflictError } from "./errors";
+export { TsPlateError, ValidationError, ConflictError, FileSystemError } from "./errors";
 export type * from "./types";

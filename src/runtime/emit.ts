@@ -1,7 +1,45 @@
 import { readdir } from "node:fs/promises";
-import { ValidationError } from "../errors";
+import { FileSystemError, ValidationError } from "../errors";
 import type { CopyDirOptions, FileName, Node, Output, OutputFile } from "../types";
 
+/**
+ * Evaluate one or more file trees and produce a flat array of resolved
+ * {@link Output} objects.
+ *
+ * This is where all lazy evaluation happens:
+ * - {@link ConditionalNode} conditions are evaluated; children of false conditions
+ *   are excluded.
+ * - Dynamic filenames (functions) are called and resolved.
+ * - Dynamic content (functions) are called and resolved.
+ * - Filenames are validated (no empty names, no directory traversal, no absolute
+ *   paths).
+ * - Source directory contents are enumerated for {@link CopyDirNode `copy-dir`}
+ *   nodes.
+ *
+ * `emit()` does **not** write anything to disk. The returned `Output` array can
+ * be inspected (e.g., for dry-run previews), transformed, or passed directly to
+ * {@link write}.
+ *
+ * @param nodes - One or more nodes to evaluate. Typically a {@link RootNode}
+ *                created by {@link root}, but individual nodes work too.
+ * @returns A promise of a flat array of {@link Output} objects, ordered by
+ *          tree-walk (depth-first, parents before children).
+ *
+ * @example
+ * ```ts
+ * const outputs = await emit(
+ *   root(
+ *     file("README.md", "# Project"),
+ *     dir("src", file("index.ts")),
+ *   ),
+ * );
+ * // outputs: [
+ * //   { type: "file", path: "README.md", content: "# Project" },
+ * //   { type: "dir", path: "src" },
+ * //   { type: "file", path: "src/index.ts" },
+ * // ]
+ * ```
+ */
 export async function emit(...nodes: Node[]): Promise<Output[]> {
   const outputs: Output[] = [];
 
@@ -15,18 +53,35 @@ export async function emit(...nodes: Node[]): Promise<Output[]> {
 
   function validateFileName(name: string): void {
     if (name.trim().length === 0) {
-      throw new ValidationError(`Invalid filename: "${name}". Filename must not be empty.`);
+      throw new ValidationError(
+        `Filename validation failed: "${name}". Filename must be a non-empty string. Got an empty or whitespace-only value.`,
+        {
+          path: name,
+          nodeType: "file",
+          hint: "Provide a non-empty relative filename (e.g., 'index.ts').",
+        },
+      );
     }
 
     if (name.split("/").includes("..")) {
       throw new ValidationError(
-        `Invalid filename: "${name}". Filename must not traverse outside the target directory.`,
+        `Filename validation failed: "${name}". Path traverses outside the target directory. Directory traversal ('..') is not allowed in filenames.`,
+        {
+          path: name,
+          nodeType: "file",
+          hint: "Use a relative path that stays within the target directory.",
+        },
       );
     }
 
     if (name.startsWith("/")) {
       throw new ValidationError(
-        `Invalid filename: "${name}". Absolute paths are not allowed. Use a relative path instead.`,
+        `Filename validation failed: "${name}". Absolute paths are not permitted. Use a relative filename instead (e.g., 'src/index.ts').`,
+        {
+          path: name,
+          nodeType: "file",
+          hint: "Remove the leading '/' and use a relative path instead.",
+        },
       );
     }
   }
@@ -36,7 +91,16 @@ export async function emit(...nodes: Node[]): Promise<Output[]> {
     targetBase: string,
     options: CopyDirOptions | undefined,
   ): Promise<void> {
-    const entries = await readdir(source, { withFileTypes: true });
+    let entries;
+    try {
+      entries = await readdir(source, { withFileTypes: true });
+    } catch (cause) {
+      throw new FileSystemError(`Failed to read source directory '${source}' for copy-dir.`, {
+        path: source,
+        nodeType: "copy-dir",
+        cause,
+      });
+    }
 
     for (const entry of entries) {
       const fullPath = `${source}/${entry.name}`;

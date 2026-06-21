@@ -34,13 +34,15 @@ test("validates filenames and evaluates name before content", async () => {
         },
       ),
     ),
-  ).rejects.toThrow("Filename must not be empty");
+  ).rejects.toThrow("Filename validation failed");
 
   expect(contentEvaluated).toBe(false);
 
-  await expect(emit(file(() => "../secret.txt", "content"))).rejects.toThrow("must not traverse");
+  await expect(emit(file(() => "../secret.txt", "content"))).rejects.toThrow(
+    "Directory traversal ('..') is not allowed",
+  );
 
   await expect(emit(file(() => "/etc/passwd", "content"))).rejects.toThrow(
-    "Absolute paths are not allowed",
+    "Absolute paths are not permitted",
   );
 });
