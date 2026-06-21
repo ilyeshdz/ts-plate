@@ -1,5 +1,39 @@
 # Changelog
 
+## v0.4.4
+
+[compare changes](https://github.com/ilyeshdz/ts-plate/compare/v0.4.3...v0.4.4)
+
+### 🚀 Enhancements
+
+- Add readonly modifiers and strategy-content type safety ([755a60a](https://github.com/ilyeshdz/ts-plate/commit/755a60a))
+- Implement structured error types ([59fb4c3](https://github.com/ilyeshdz/ts-plate/commit/59fb4c3))
+
+### 💅 Refactors
+
+- Reorganize src into nodes and runtime directories with custom error classes ([5a0a48f](https://github.com/ilyeshdz/ts-plate/commit/5a0a48f))
+
+### 📖 Documentation
+
+- Add comprehensive jsdoc to public api ([732a676](https://github.com/ilyeshdz/ts-plate/commit/732a676))
+- Better documentation ([5425367](https://github.com/ilyeshdz/ts-plate/commit/5425367))
+
+### 🏡 Chore
+
+- Use workspace typescript version for vscode ([c3f56bc](https://github.com/ilyeshdz/ts-plate/commit/c3f56bc))
+
+### ✅ Tests
+
+- Reduce test suite from 143 to 12 behavior-focused tests ([9358d14](https://github.com/ilyeshdz/ts-plate/commit/9358d14))
+
+### 🤖 CI
+
+- Deploy docs on release published event instead of tag push ([e65a9c3](https://github.com/ilyeshdz/ts-plate/commit/e65a9c3))
+
+### ❤️ Contributors
+
+- Ilyes Hernandez ([@ilyeshdz](https://github.com/ilyeshdz))
+
 ## v0.4.3
 
 [compare changes](https://github.com/ilyeshdz/ts-plate/compare/v0.4.2...v0.4.3)
