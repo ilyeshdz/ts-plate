@@ -27,3 +27,14 @@ test("file accepts a function as content", () => {
   expect(node.name).toBe("name.ts");
   expect(node.content).toBe(fn);
 });
+
+test("file accepts options with strategy", () => {
+  const node = file("test.txt", "content", { strategy: "skip" });
+  expect(node.options).toEqual({ strategy: "skip" });
+});
+
+test("file with options but no content", () => {
+  const node = file("test.txt", undefined, { strategy: "overwrite" });
+  expect(node.options).toEqual({ strategy: "overwrite" });
+  expect(node.content).toBeUndefined();
+});

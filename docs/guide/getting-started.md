@@ -158,6 +158,103 @@ const outputs = await emit(tree);
 await write(outputs);
 ```
 
+## Conflict Strategies
+
+ts-plate can scaffold into existing projects safely by controlling how files behave when they already exist.
+
+By default, files are overwritten without warning. Pass a `strategy` option to `file()` to change this.
+
+```ts
+import { file } from "@ilyeshdz/ts-plate";
+
+file("README.md", "# Hello", { strategy: "skip" });
+file("package.json", { name: "my-app" }, { strategy: "merge" });
+file("tsconfig.json", { compilerOptions: { strict: true } }, { strategy: "overwrite" });
+```
+
+### Strategies
+
+| Strategy    | Existing file | Result     |
+| ----------- | ------------- | ---------- |
+| `overwrite` | yes           | replaced   |
+| `skip`      | yes           | untouched  |
+| `error`     | yes           | throws     |
+| `merge`     | yes           | deep merge |
+
+- **`overwrite`** (default) — always replace the existing file.
+- **`skip`** — leave the existing file untouched.
+- **`error`** — throw an error if the file exists.
+- **`merge`** — deep-merge JSON objects when the file already exists. Generated values take precedence on conflicts. Arrays are replaced entirely. Throws a descriptive error if either side is not a JSON object.
+
+### Merge example
+
+Existing `package.json`:
+
+```json
+{
+  "scripts": {
+    "start": "node index.js"
+  }
+}
+```
+
+Generated tree:
+
+```ts
+file(
+  "package.json",
+  {
+    scripts: {
+      dev: "vite",
+    },
+  },
+  { strategy: "merge" },
+);
+```
+
+Result:
+
+```json
+{
+  "scripts": {
+    "start": "node index.js",
+    "dev": "vite"
+  }
+}
+```
+
+### Realistic example
+
+```ts
+import { render, root, dir, file } from "@ilyeshdz/ts-plate";
+
+const outputs = await render(
+  root(
+    dir(
+      "my-app",
+
+      file(
+        "package.json",
+        {
+          scripts: {
+            dev: "vite",
+          },
+        },
+        {
+          strategy: "merge",
+        },
+      ),
+
+      file("README.md", "# My App", {
+        strategy: "skip",
+      }),
+    ),
+  ),
+);
+```
+
+Conflict strategies make ts-plate a safe scaffolding tool for both new and existing projects.
+
 ## Composition
 
 Trees are just data. Wrap them in functions and compose freely.

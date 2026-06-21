@@ -1,4 +1,4 @@
-import type { Node, Output } from "./types";
+import type { Node, Output, OutputFile } from "./types";
 
 export async function emit(...nodes: Node[]): Promise<Output[]> {
   const outputs: Output[] = [];
@@ -34,13 +34,18 @@ export async function emit(...nodes: Node[]): Promise<Output[]> {
         });
         break;
 
-      case "file":
-        outputs.push({
+      case "file": {
+        const fileOutput: OutputFile = {
           type: "file",
           path: join(basePath, node.name),
           content: typeof node.content === "function" ? await node.content() : node.content,
-        });
+        };
+        if (node.options?.strategy) {
+          fileOutput.strategy = node.options.strategy;
+        }
+        outputs.push(fileOutput);
         break;
+      }
 
       case "conditional": {
         const pass = typeof node.condition === "function" ? node.condition() : node.condition;
