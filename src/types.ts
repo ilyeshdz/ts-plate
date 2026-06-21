@@ -1,4 +1,4 @@
-export type Node = RootNode | FileNode | DirectoryNode | CopyNode | ConditionalNode;
+export type Node = RootNode | FileNode | DirectoryNode | CopyNode | CopyDirNode | ConditionalNode;
 
 export type Condition = boolean | (() => boolean);
 
@@ -35,6 +35,17 @@ export interface CopyNode {
   type: "copy";
   from: string;
   name: string;
+}
+
+export interface CopyDirNode {
+  type: "copy-dir";
+  from: string;
+  options?: CopyDirOptions;
+}
+
+export interface CopyDirOptions {
+  rename?: (name: string) => string;
+  filter?: (path: string) => boolean;
 }
 
 export interface ConditionalNode {

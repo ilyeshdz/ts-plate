@@ -1,4 +1,5 @@
-import type { FileName, Node, Output, OutputFile } from "./types";
+import { readdir } from "node:fs/promises";
+import type { CopyDirOptions, FileName, Node, Output, OutputFile } from "./types";
 
 export async function emit(...nodes: Node[]): Promise<Output[]> {
   const outputs: Output[] = [];
@@ -29,6 +30,32 @@ export async function emit(...nodes: Node[]): Promise<Output[]> {
     }
   }
 
+  async function walkCopyDir(
+    source: string,
+    targetBase: string,
+    options: CopyDirOptions | undefined,
+  ): Promise<void> {
+    const entries = await readdir(source, { withFileTypes: true });
+
+    for (const entry of entries) {
+      const fullPath = `${source}/${entry.name}`;
+
+      if (options?.filter && !options.filter(fullPath)) {
+        continue;
+      }
+
+      const destName = options?.rename ? options.rename(entry.name) : entry.name;
+      const destPath = join(targetBase, destName);
+
+      if (entry.isDirectory()) {
+        outputs.push({ type: "dir", path: destPath });
+        await walkCopyDir(fullPath, destPath, options);
+      } else if (entry.isFile()) {
+        outputs.push({ type: "copy", path: destPath, from: fullPath });
+      }
+    }
+  }
+
   async function walk(node: Node, basePath: string) {
     switch (node.type) {
       case "root":
@@ -54,6 +81,10 @@ export async function emit(...nodes: Node[]): Promise<Output[]> {
           path: join(basePath, node.name),
           from: node.from,
         });
+        break;
+
+      case "copy-dir":
+        await walkCopyDir(node.from, basePath, node.options);
         break;
 
       case "file": {

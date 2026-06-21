@@ -12,11 +12,35 @@ afterEach(() => {
   vol.reset();
 });
 
-test("copy creates a copy node", () => {
+test("copy with string name creates a CopyNode", () => {
   expect(copy("/source/app.ts", "app.ts")).toEqual({
     type: "copy",
     from: "/source/app.ts",
     name: "app.ts",
+  });
+});
+
+test("copy with no name creates a CopyDirNode", () => {
+  expect(copy("/templates")).toEqual({
+    type: "copy-dir",
+    from: "/templates",
+    options: undefined,
+  });
+});
+
+test("copy with options creates a CopyDirNode", () => {
+  expect(
+    copy("/templates", {
+      rename: (name: string) => name.replace("__name__", "my-app"),
+      filter: (path: string) => path.endsWith(".ts"),
+    }),
+  ).toEqual({
+    type: "copy-dir",
+    from: "/templates",
+    options: {
+      rename: expect.any(Function),
+      filter: expect.any(Function),
+    },
   });
 });
 
