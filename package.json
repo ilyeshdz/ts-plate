@@ -25,7 +25,7 @@
     "dev": "tsdown --watch",
     "test": "vitest",
     "typecheck": "tsc --noEmit",
-    "release": "changelogen --release --push",
+    "release": "changelogen --bump --push",
     "prepublishOnly": "pnpm run build",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
