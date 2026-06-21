@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.4.3
+
+[compare changes](https://github.com/ilyeshdz/ts-plate/compare/v0.4.2...v0.4.3)
+
+### 🤖 CI
+
+- Deploy docs on release ([042ae83](https://github.com/ilyeshdz/ts-plate/commit/042ae83))
+
+### ❤️ Contributors
+
+- Ilyes Hernandez ([@ilyeshdz](https://github.com/ilyeshdz))
+
 ## v0.4.2
 
 [compare changes](https://github.com/ilyeshdz/ts-plate/compare/v0.4.1...v0.4.2)
