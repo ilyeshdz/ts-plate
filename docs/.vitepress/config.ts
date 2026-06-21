@@ -12,31 +12,22 @@ export default defineConfig({
     siteTitle: "ts-plate",
     nav: [
       { text: "Home", link: "/" },
-      { text: "Guide", link: "/guide/getting-started" },
-      { text: "API", link: "/api/" },
+      { text: "Docs", link: "/guide/introduction" },
     ],
     sidebar: {
       "/guide/": [
         {
-          text: "Guide",
+          text: "Docs",
           items: [
+            { text: "Introduction", link: "/guide/introduction" },
             { text: "Getting Started", link: "/guide/getting-started" },
-            { text: "Why ts-plate?", link: "/guide/why-ts-plate" },
-            { text: "Core Concepts", link: "/guide/core-concepts" },
-            { text: "Recipes", link: "/guide/recipes" },
           ],
-        },
-      ],
-      "/api/": [
-        {
-          text: "API Reference",
-          items: [{ text: "Overview", link: "/api/" }],
         },
       ],
     },
     footer: {
-      message: "Built for people who want generators to feel like real TypeScript.",
-      copyright: "MIT Licensed.",
+      message: "MIT Licensed.",
+      copyright: `${new Date().getFullYear()} Ilyes Hernandez`,
     },
     socialLinks: [{ icon: "github", link: "https://github.com/ilyeshdz/ts-plate" }],
   },
