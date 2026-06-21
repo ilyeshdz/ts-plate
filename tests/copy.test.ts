@@ -6,102 +6,58 @@ vi.mock("node:fs/promises", async () => {
   return fs.promises;
 });
 
-import { copy, dir, emit, file, root, write } from "../src";
+import { copy, dir, emit, render, root } from "../src";
 
 afterEach(() => {
   vol.reset();
 });
 
-test("copy with string name creates a CopyNode", () => {
-  expect(copy("/source/app.ts", "app.ts")).toEqual({
-    type: "copy",
-    from: "/source/app.ts",
-    name: "app.ts",
+test("copy file and directory nodes through emit", async () => {
+  vol.fromJSON({
+    "/source/app.ts": "export const x = 1",
+    "/templates/README.md": "# Template",
+    "/templates/src/index.ts": "console.log('hi')",
   });
-});
 
-test("copy with no name creates a CopyDirNode", () => {
-  expect(copy("/templates")).toEqual({
-    type: "copy-dir",
-    from: "/templates",
-    options: undefined,
-  });
-});
-
-test("copy with options creates a CopyDirNode", () => {
-  expect(
-    copy("/templates", {
-      rename: (name: string) => name.replace("__name__", "my-app"),
-      filter: (path: string) => path.endsWith(".ts"),
-    }),
-  ).toEqual({
-    type: "copy-dir",
-    from: "/templates",
-    options: {
-      rename: expect.any(Function),
-      filter: expect.any(Function),
-    },
-  });
-});
-
-test("emit with a copy node at root level", async () => {
-  expect(await emit(copy("/source/app.ts", "app.ts"))).toEqual([
-    { type: "copy", path: "app.ts", from: "/source/app.ts" },
-  ]);
-});
-
-test("emit with a copy node nested inside a directory", async () => {
-  const tree = root(dir("src", copy("/source/app.ts", "app.ts")));
-
-  expect(await emit(tree)).toEqual([
-    { type: "dir", path: "src" },
-    { type: "copy", path: "src/app.ts", from: "/source/app.ts" },
-  ]);
-});
-
-test("emit with copy node alongside files and dirs", async () => {
   const tree = root(
-    file("readme.md", "# Hello"),
-    copy("/source/data.json", "data.json"),
-    dir("lib", file("index.ts")),
+    copy("/source/app.ts", "lib/app.ts"),
+    dir(
+      "output",
+      copy("/templates", {
+        rename: (n: string) => n.replace(".md", ".txt"),
+        filter: (p: string) => !p.includes("node_modules"),
+      }),
+    ),
   );
 
-  expect(await emit(tree)).toEqual([
-    { type: "file", path: "readme.md", content: "# Hello" },
-    { type: "copy", path: "data.json", from: "/source/data.json" },
-    { type: "dir", path: "lib" },
-    { type: "file", path: "lib/index.ts" },
-  ]);
+  const outputs = await emit(tree);
+
+  expect(outputs).toContainEqual({
+    type: "copy",
+    path: "lib/app.ts",
+    from: "/source/app.ts",
+  });
+  expect(outputs).toContainEqual({
+    type: "copy",
+    path: "output/README.txt",
+    from: "/templates/README.md",
+  });
+  expect(outputs).toContainEqual({
+    type: "copy",
+    path: "output/src/index.ts",
+    from: "/templates/src/index.ts",
+  });
 });
 
-test("write copies a file from source to destination", async () => {
-  fs.writeFileSync("/source.txt", "content to copy");
+test("copy-dir writes files to disk through render", async () => {
+  vol.fromJSON({
+    "/templates/README.md": "# Template",
+    "/templates/src/index.ts": "console.log('hi')",
+  });
 
-  await write([{ type: "copy", path: "dest.txt", from: "/source.txt" }], "/");
+  await render([root(dir("output", copy("/templates")))], "/");
 
-  expect(fs.readFileSync("/dest.txt", "utf-8")).toBe("content to copy");
-});
-
-test("write copies a file into a nested directory", async () => {
-  fs.writeFileSync("/source.js", "export const x = 1");
-
-  await write([{ type: "copy", path: "src/lib/util.js", from: "/source.js" }], "/");
-
-  expect(fs.statSync("/src/lib").isDirectory()).toBe(true);
-  expect(fs.readFileSync("/src/lib/util.js", "utf-8")).toBe("export const x = 1");
-});
-
-test("write with copy alongside files and directories", async () => {
-  fs.writeFileSync("/external.css", "body { margin: 0 }");
-
-  const outputs = [
-    { type: "dir" as const, path: "public" },
-    { type: "copy" as const, path: "public/style.css", from: "/external.css" },
-    { type: "file" as const, path: "public/index.html", content: "<html></html>" },
-  ];
-
-  await write(outputs, "/");
-
-  expect(fs.readFileSync("/public/style.css", "utf-8")).toBe("body { margin: 0 }");
-  expect(fs.readFileSync("/public/index.html", "utf-8")).toBe("<html></html>");
+  expect(fs.readFileSync("/output/README.md", "utf-8")).toBe("# Template");
+  expect(fs.readFileSync("/output/src/index.ts", "utf-8")).toBe("console.log('hi')");
+  expect(fs.statSync("/output/src").isDirectory()).toBe(true);
 });

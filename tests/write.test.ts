@@ -6,65 +6,38 @@ vi.mock("node:fs/promises", async () => {
   return fs.promises;
 });
 
-import { write } from "../src";
+import { file, render, write } from "../src";
 
 afterEach(() => {
   vol.reset();
 });
 
-test("writes a single file with string content", async () => {
-  await write([{ type: "file", path: "file.txt", content: "hello" }], "/");
-
-  expect(fs.readFileSync("/file.txt", "utf-8")).toBe("hello");
-});
-
-test("writes a single file with undefined content", async () => {
-  await write([{ type: "file", path: "empty.txt" }], "/");
-
-  expect(fs.readFileSync("/empty.txt", "utf-8")).toBe("");
-});
-
-test("writes a single file with object content as JSON", async () => {
-  const obj = { name: "test", value: 42 };
-
-  await write([{ type: "file", path: "data.json", content: obj }], "/");
-
-  expect(fs.readFileSync("/data.json", "utf-8")).toBe(JSON.stringify(obj, null, 2));
-});
-
-test("creates a directory", async () => {
-  await write([{ type: "dir", path: "mydir" }], "/");
-
-  expect(fs.statSync("/mydir").isDirectory()).toBe(true);
-});
-
-test("writes nested files and directories", async () => {
-  const outputs = [
-    { type: "dir" as const, path: "src" },
-    { type: "file" as const, path: "src/index.ts", content: 'console.log("hi")' },
-    { type: "dir" as const, path: "src/utils" },
-    {
-      type: "file" as const,
-      path: "src/utils/helpers.ts",
-      content: "export const add = (a: number, b: number) => a + b",
-    },
-  ];
-
-  await write(outputs, "/");
-
-  expect(fs.statSync("/src").isDirectory()).toBe(true);
-  expect(fs.statSync("/src/utils").isDirectory()).toBe(true);
-  expect(fs.readFileSync("/src/index.ts", "utf-8")).toBe('console.log("hi")');
-  expect(fs.readFileSync("/src/utils/helpers.ts", "utf-8")).toBe(
-    "export const add = (a: number, b: number) => a + b",
-  );
-});
-
-test("uses custom basePath", async () => {
+test("write creates files and directories", async () => {
   await write(
     [
-      { type: "dir", path: "sub" },
-      { type: "file", path: "sub/readme.md", content: "# hi" },
+      { type: "file" as const, path: "README.md", content: "# Hello" },
+      { type: "dir" as const, path: "src" },
+      { type: "file" as const, path: "src/index.ts", content: "export const x = 1" },
+      { type: "file" as const, path: "src/data.json", content: { key: "value" } },
+      { type: "file" as const, path: "src/empty.ts" },
+    ],
+    "/root",
+  );
+
+  expect(fs.readFileSync("/root/README.md", "utf-8")).toBe("# Hello");
+  expect(fs.readFileSync("/root/src/index.ts", "utf-8")).toBe("export const x = 1");
+  expect(fs.readFileSync("/root/src/data.json", "utf-8")).toBe(
+    JSON.stringify({ key: "value" }, null, 2),
+  );
+  expect(fs.readFileSync("/root/src/empty.ts", "utf-8")).toBe("");
+  expect(fs.statSync("/root/src").isDirectory()).toBe(true);
+});
+
+test("write with custom basePath", async () => {
+  await write(
+    [
+      { type: "dir" as const, path: "sub" },
+      { type: "file" as const, path: "sub/readme.md", content: "# hi" },
     ],
     "/custom",
   );
@@ -72,17 +45,9 @@ test("uses custom basePath", async () => {
   expect(fs.readFileSync("/custom/sub/readme.md", "utf-8")).toBe("# hi");
 });
 
-test("writes multiple outputs", async () => {
-  await write(
-    [
-      { type: "file", path: "a.txt", content: "aaa" },
-      { type: "file", path: "b.txt", content: "bbb" },
-      { type: "file", path: "c.txt", content: "ccc" },
-    ],
-    "/",
-  );
+test("render emits and writes in one call", async () => {
+  const outputs = await render([file("hello.txt", "world")], "/root");
 
-  expect(fs.readFileSync("/a.txt", "utf-8")).toBe("aaa");
-  expect(fs.readFileSync("/b.txt", "utf-8")).toBe("bbb");
-  expect(fs.readFileSync("/c.txt", "utf-8")).toBe("ccc");
+  expect(outputs).toEqual([{ type: "file", path: "hello.txt", content: "world" }]);
+  expect(fs.readFileSync("/root/hello.txt", "utf-8")).toBe("world");
 });
