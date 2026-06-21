@@ -72,7 +72,7 @@ test("merge strategy", async () => {
     "/",
   );
 
-  expect(JSON.parse(fs.readFileSync("/config.json", "utf-8"))).toEqual({
+  expect(JSON.parse(fs.readFileSync("/config.json", "utf-8") as string)).toEqual({
     a: 1,
     b: 2,
     nested: { x: 1, y: 2 },
