@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.4.2
+
+[compare changes](https://github.com/ilyeshdz/ts-plate/compare/v0.4.1...v0.4.2)
+
+### 🩹 Fixes
+
+- Release workflow ([2a487d4](https://github.com/ilyeshdz/ts-plate/commit/2a487d4))
+
+### 🤖 CI
+
+- Remove release workflow (changelogen opens browser to create release manually) ([afb29d2](https://github.com/ilyeshdz/ts-plate/commit/afb29d2))
+
+### ❤️ Contributors
+
+- Ilyes Hernandez ([@ilyeshdz](https://github.com/ilyeshdz))
+
 ## v0.4.1
 
 [compare changes](https://github.com/ilyeshdz/ts-plate/compare/v0.4.0...v0.4.1)

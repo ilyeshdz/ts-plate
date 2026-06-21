@@ -1,6 +1,6 @@
 {
   "name": "@ilyeshdz/ts-plate",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "A tiny TypeScript library for composing file trees and generator output.",
   "homepage": "https://github.com/ilyeshdz/ts-plate#readme",
   "bugs": {
@@ -25,7 +25,7 @@
     "dev": "tsdown --watch",
     "test": "vitest",
     "typecheck": "tsc --noEmit",
-    "release": "changelogen --bump --push",
+    "release": "changelogen --release --no-github --push",
     "prepublishOnly": "pnpm run build",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
