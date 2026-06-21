@@ -10,66 +10,66 @@ export type FileName = string | (() => string) | (() => Promise<string>);
 export type FileStrategy = "overwrite" | "skip" | "error" | "merge";
 
 export interface FileOptions {
-  strategy?: FileStrategy;
+  readonly strategy?: FileStrategy;
 }
 
 export interface FileNode {
-  type: "file";
-  name: FileName;
-  content?: FileContent | FileContentFn;
-  options?: FileOptions;
+  readonly type: "file";
+  readonly name: FileName;
+  readonly content?: FileContent | FileContentFn;
+  readonly options?: FileOptions;
 }
 
 export interface DirectoryNode {
-  type: "dir";
-  name: string;
-  children: Node[];
+  readonly type: "dir";
+  readonly name: string;
+  readonly children: readonly Node[];
 }
 
 export interface RootNode {
-  type: "root";
-  children: Node[];
+  readonly type: "root";
+  readonly children: readonly Node[];
 }
 
 export interface CopyNode {
-  type: "copy";
-  from: string;
-  name: string;
+  readonly type: "copy";
+  readonly from: string;
+  readonly name: string;
 }
 
 export interface CopyDirNode {
-  type: "copy-dir";
-  from: string;
-  options?: CopyDirOptions;
+  readonly type: "copy-dir";
+  readonly from: string;
+  readonly options?: CopyDirOptions;
 }
 
 export interface CopyDirOptions {
-  rename?: (name: string) => string;
-  filter?: (path: string) => boolean;
+  readonly rename?: (name: string) => string;
+  readonly filter?: (path: string) => boolean;
 }
 
 export interface ConditionalNode {
-  type: "conditional";
-  condition: Condition;
-  children: Node[];
+  readonly type: "conditional";
+  readonly condition: Condition;
+  readonly children: readonly Node[];
 }
 
 export type Output = OutputFile | OutputDirectory | OutputCopy;
 
 export interface OutputFile {
-  type: "file";
-  path: string;
-  content?: FileContent;
-  strategy?: FileStrategy;
+  readonly type: "file";
+  readonly path: string;
+  readonly content?: FileContent;
+  readonly strategy?: FileStrategy;
 }
 
 export interface OutputDirectory {
-  type: "dir";
-  path: string;
+  readonly type: "dir";
+  readonly path: string;
 }
 
 export interface OutputCopy {
-  type: "copy";
-  path: string;
-  from: string;
+  readonly type: "copy";
+  readonly path: string;
+  readonly from: string;
 }

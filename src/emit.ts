@@ -95,10 +95,8 @@ export async function emit(...nodes: Node[]): Promise<Output[]> {
           type: "file",
           path: join(basePath, resolvedName),
           content: typeof node.content === "function" ? await node.content() : node.content,
+          ...(node.options?.strategy ? { strategy: node.options.strategy } : {}),
         };
-        if (node.options?.strategy) {
-          fileOutput.strategy = node.options.strategy;
-        }
         outputs.push(fileOutput);
         break;
       }

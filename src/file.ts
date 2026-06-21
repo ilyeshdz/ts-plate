@@ -1,4 +1,25 @@
-import type { FileContent, FileContentFn, FileName, FileNode, FileOptions } from "./types";
+import type {
+  FileContent,
+  FileContentFn,
+  FileName,
+  FileNode,
+  FileOptions,
+  FileStrategy,
+} from "./types";
+
+export function file(
+  name: FileName,
+  content: string,
+  options?: FileOptions & { strategy?: Exclude<FileStrategy, "merge"> },
+): FileNode;
+
+export function file(
+  name: FileName,
+  content: Record<string, unknown>,
+  options?: FileOptions,
+): FileNode;
+
+export function file(name: FileName, content?: FileContentFn, options?: FileOptions): FileNode;
 
 export function file(
   name: FileName,
