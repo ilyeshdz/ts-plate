@@ -1,7 +1,7 @@
-import type { FileContent, FileContentFn, FileNode, FileOptions } from "./types";
+import type { FileContent, FileContentFn, FileName, FileNode, FileOptions } from "./types";
 
 export function file(
-  name: string,
+  name: FileName,
   content?: FileContent | FileContentFn,
   options?: FileOptions,
 ): FileNode {

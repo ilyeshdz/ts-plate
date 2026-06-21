@@ -51,6 +51,83 @@ file("data.json", async () => {
 
 Function content is lazy. It runs during emit, not when you build the tree.
 
+### Dynamic Filenames
+
+Filenames can be computed lazily, just like file contents.
+
+Pass a function (sync or async) instead of a string to `file()`:
+
+```ts
+file(() => `${packageName}.config.ts`, {});
+```
+
+```ts
+file(async () => {
+  const pkg = await fetchPackage();
+  return `${pkg.name}.json`;
+}, pkg);
+```
+
+The filename is resolved during emit, not when the tree is built. This keeps the tree declarative.
+
+Filename evaluation happens **before** content evaluation. If the resolved filename is invalid, content is never resolved — preventing expensive work.
+
+Resolved filenames are validated:
+
+| Rule              | Example               | Reason                   |
+| ----------------- | --------------------- | ------------------------ |
+| Non-empty         | `() => ""`            | Empty path segment       |
+| Non-whitespace    | `() => "  "`          | Only whitespace          |
+| No path traversal | `() => "../secret"`   | Escapes target directory |
+| Relative only     | `() => "/etc/passwd"` | Absolute path            |
+
+All combinations of static/dynamic names and contents work together:
+
+```ts
+file("static.txt", "static content");
+file("static.txt", () => "lazy content");
+file("static.txt", async () => "async content");
+
+file(() => "dynamic.txt", "static content");
+file(
+  () => "dynamic.txt",
+  () => "lazy content",
+);
+file(
+  () => "dynamic.txt",
+  async () => "async content",
+);
+
+file(async () => "async-name.txt", "static content");
+file(
+  async () => "async-name.txt",
+  () => "lazy content",
+);
+file(
+  async () => "async-name.txt",
+  async () => "async content",
+);
+```
+
+Here is a realistic example using dynamic filenames:
+
+```ts
+const packageName = "my-lib";
+
+const tree = root(
+  dir(
+    "packages",
+
+    file(() => `${packageName}.package.json`, {
+      name: packageName,
+      version: "1.0.0",
+    }),
+
+    file(() => `${packageName}.README.md`, `# ${packageName}`),
+  ),
+);
+```
+
 ## Write
 
 Pass the outputs to `write()` when you're ready.

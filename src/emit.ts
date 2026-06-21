@@ -1,10 +1,32 @@
-import type { Node, Output, OutputFile } from "./types";
+import type { FileName, Node, Output, OutputFile } from "./types";
 
 export async function emit(...nodes: Node[]): Promise<Output[]> {
   const outputs: Output[] = [];
 
   function join(base: string, name: string) {
     return base ? `${base}/${name}` : name;
+  }
+
+  async function resolveFileName(name: FileName): Promise<string> {
+    return typeof name === "function" ? await name() : name;
+  }
+
+  function validateFileName(name: string): void {
+    if (name.trim().length === 0) {
+      throw new Error(`Invalid filename: "${name}". Filename must not be empty.`);
+    }
+
+    if (name.split("/").includes("..")) {
+      throw new Error(
+        `Invalid filename: "${name}". Filename must not traverse outside the target directory.`,
+      );
+    }
+
+    if (name.startsWith("/")) {
+      throw new Error(
+        `Invalid filename: "${name}". Absolute paths are not allowed. Use a relative path instead.`,
+      );
+    }
   }
 
   async function walk(node: Node, basePath: string) {
@@ -35,9 +57,12 @@ export async function emit(...nodes: Node[]): Promise<Output[]> {
         break;
 
       case "file": {
+        const resolvedName = await resolveFileName(node.name);
+        validateFileName(resolvedName);
+
         const fileOutput: OutputFile = {
           type: "file",
-          path: join(basePath, node.name),
+          path: join(basePath, resolvedName),
           content: typeof node.content === "function" ? await node.content() : node.content,
         };
         if (node.options?.strategy) {

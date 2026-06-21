@@ -5,6 +5,8 @@ export type Condition = boolean | (() => boolean);
 export type FileContent = string | Record<string, any>;
 export type FileContentFn = () => FileContent | Promise<FileContent>;
 
+export type FileName = string | (() => string) | (() => Promise<string>);
+
 export type FileStrategy = "overwrite" | "skip" | "error" | "merge";
 
 export interface FileOptions {
@@ -13,7 +15,7 @@ export interface FileOptions {
 
 export interface FileNode {
   type: "file";
-  name: string;
+  name: FileName;
   content?: FileContent | FileContentFn;
   options?: FileOptions;
 }
