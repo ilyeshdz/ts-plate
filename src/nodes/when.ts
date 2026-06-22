@@ -1,4 +1,5 @@
 import type { ConditionalNode, Condition, Node } from "../types";
+import { normalizeChildren } from "./normalize-children";
 
 /**
  * Create a conditional node that includes children only when a condition is met.
@@ -7,9 +8,13 @@ import type { ConditionalNode, Condition, Node } from "../types";
  * If the condition is a function, it is called lazily when the tree is
  * walked, allowing conditions based on runtime state.
  *
+ * Arrays passed as children are automatically flattened, so you can
+ * compose conditional contents from helper functions that return `Node[]`.
+ *
  * @param condition - A boolean value, a sync function `() => boolean`,
  *                    or an async function `() => Promise<boolean>`.
- * @param children - One or more nodes to include when the condition is truthy.
+ * @param children - One or more nodes or arrays of nodes. Arrays are
+ *                   recursively flattened.
  * @returns A `ConditionalNode`.
  *
  * @example
@@ -27,10 +32,10 @@ import type { ConditionalNode, Condition, Node } from "../types";
  * }, file("admin-panel.ts"))
  * ```
  */
-export function when(condition: Condition, ...children: Node[]): ConditionalNode {
+export function when(condition: Condition, ...children: (Node | Node[])[]): ConditionalNode {
   return {
     type: "conditional",
     condition,
-    children,
+    children: normalizeChildren(children),
   };
 }
