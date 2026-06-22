@@ -29,11 +29,19 @@ export class TsPlateError extends Error {
   /** The node type that caused the error. */
   readonly nodeType?: string;
 
+  /** The conflict strategy in effect when the error occurred. */
+  readonly strategy?: string;
+
+  /** The underlying cause, typically an original `Error` or `unknown`. */
+  readonly cause?: unknown;
+
   constructor(message: string, context?: ErrorContext) {
     super(message, context?.cause ? { cause: context.cause } : undefined);
     this.name = "TsPlateError";
     this.path = context?.path;
     this.nodeType = context?.nodeType;
+    this.strategy = context?.strategy;
+    this.cause = context?.cause;
   }
 }
 
