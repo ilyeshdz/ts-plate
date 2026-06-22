@@ -12,9 +12,10 @@ export type Node = RootNode | FileNode | DirectoryNode | CopyNode | CopyDirNode 
  * in the output.
  *
  * - A static `boolean` is evaluated immediately when `emit()` walks the tree.
- * - A `() => boolean` function is called lazily during `emit()`.
+ * - A `() => boolean | Promise<boolean>` function is called lazily during `emit()`.
+ *   Return a `Promise` to resolve the condition asynchronously.
  */
-export type Condition = boolean | (() => boolean);
+export type Condition = boolean | (() => boolean | Promise<boolean>);
 
 /**
  * Static content for a file node.
@@ -144,11 +145,11 @@ export interface CopyDirOptions {
  * A conditional node that includes children only when a condition is met.
  *
  * Created via {@link when()}. The condition is evaluated during `emit()`,
- * not at build time.
+ * not at build time. Supports sync and async (Promise-based) conditions.
  */
 export interface ConditionalNode {
   readonly type: "conditional";
-  /** Boolean or sync function evaluated during `emit()`. */
+  /** Boolean or sync/async function evaluated during `emit()`. */
   readonly condition: Condition;
   /** Nodes to include when the condition is truthy. */
   readonly children: readonly Node[];

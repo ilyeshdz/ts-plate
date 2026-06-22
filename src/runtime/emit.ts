@@ -7,8 +7,8 @@ import type { CopyDirOptions, FileName, Node, Output, OutputFile } from "../type
  * {@link Output} objects.
  *
  * This is where all lazy evaluation happens:
- * - {@link ConditionalNode} conditions are evaluated; children of false conditions
- *   are excluded.
+ * - {@link ConditionalNode} conditions are evaluated (sync or async); children of
+ *   false conditions are excluded.
  * - Dynamic filenames (functions) are called and resolved.
  * - Dynamic content (functions) are called and resolved.
  * - Filenames are validated (no empty names, no directory traversal, no absolute
@@ -167,7 +167,7 @@ export async function emit(...nodes: Node[]): Promise<Output[]> {
       }
 
       case "conditional": {
-        const pass = typeof node.condition === "function" ? node.condition() : node.condition;
+        const pass = typeof node.condition === "function" ? await node.condition() : node.condition;
         if (pass) {
           for (const child of node.children) {
             await walk(child, basePath);

@@ -55,7 +55,15 @@ when(true, file("always.txt"));
 when(false, file("never.txt")); // [!code --]
 ```
 
-The condition can be a boolean or a function (sync or async). `when()` never appears in the output itself.
+The condition can be a boolean, a sync function, or an async function. `when()` never appears in the output itself.
+
+```ts
+// Async condition — resolved during emit()
+when(async () => {
+  const user = await db.getUser();
+  return user.role === "admin";
+}, file("admin-panel.ts"));
+```
 
 ## copy()
 

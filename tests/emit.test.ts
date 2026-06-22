@@ -47,3 +47,29 @@ test("empty and multiple roots produce correct outputs", async () => {
     { type: "file", path: "b.txt" },
   ]);
 });
+
+test("async when condition resolves to true", async () => {
+  const tree = root(
+    when(async () => true, file("yes.txt", "included")),
+    when(async () => false, file("no.txt", "excluded")),
+  );
+
+  expect(await emit(tree)).toEqual([{ type: "file", path: "yes.txt", content: "included" }]);
+});
+
+test("async when with dynamic async content inside", async () => {
+  const tree = root(
+    when(
+      async () => {
+        const res = await Promise.resolve(true);
+        return res;
+      },
+      file("data.txt", async () => {
+        const content = await Promise.resolve("async content");
+        return content;
+      }),
+    ),
+  );
+
+  expect(await emit(tree)).toEqual([{ type: "file", path: "data.txt", content: "async content" }]);
+});

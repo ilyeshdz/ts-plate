@@ -7,8 +7,8 @@ import type { ConditionalNode, Condition, Node } from "../types";
  * If the condition is a function, it is called lazily when the tree is
  * walked, allowing conditions based on runtime state.
  *
- * @param condition - A boolean value or a sync function `() => boolean`.
- *                    Asynchronous conditions are not supported.
+ * @param condition - A boolean value, a sync function `() => boolean`,
+ *                    or an async function `() => Promise<boolean>`.
  * @param children - One or more nodes to include when the condition is truthy.
  * @returns A `ConditionalNode`.
  *
@@ -19,6 +19,12 @@ import type { ConditionalNode, Condition, Node } from "../types";
  *
  * // Dynamic condition (evaluated at emit time)
  * when(() => process.env.CI === "true", file("ci-config.yml"))
+ *
+ * // Async condition (resolved during emit)
+ * when(async () => {
+ *   const user = await fetchCurrentUser();
+ *   return user.role === "admin";
+ * }, file("admin-panel.ts"))
  * ```
  */
 export function when(condition: Condition, ...children: Node[]): ConditionalNode {
