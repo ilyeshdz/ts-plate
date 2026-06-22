@@ -15,17 +15,6 @@ const outputs = await emit(file("hello.txt", "Hello, world!"));
 
 It is not a scaffolding CLI. It is the generation layer you build your own tools on.
 
-> **Real-world example:** [`create-ts-plate`](https://github.com/ilyeshdz/create-ts-plate) — an interactive scaffolding CLI built on ts-plate. Try it with `npx create-ts-plate`.
-
-## Install
-
-```bash
-npm install @ilyeshdz/ts-plate
-pnpm add @ilyeshdz/ts-plate
-yarn add @ilyeshdz/ts-plate
-bun add @ilyeshdz/ts-plate
-```
-
 ## Quick start
 
 ```ts
@@ -44,17 +33,18 @@ const outputs = await emit(tree);
 await write(outputs);
 ```
 
-## Ecosystem
+## Project starter
 
-### [`create-ts-plate`](https://github.com/ilyeshdz/create-ts-plate)
-
-An interactive scaffolding CLI built on top of ts-plate. It asks questions, composes a tree from your answers, and writes everything to disk — all using ts-plate under the hood.
+Use [`create-ts-plate`](https://github.com/ilyeshdz/create-ts-plate) to scaffold a new project with ts-plate pre-configured:
 
 ```bash
-npx create-ts-plate
+pnpm create ts-plate
+npm create ts-plate
+bun create ts-plate
+yarn create ts-plate
 ```
 
-Great as a reference if you're building your own scaffolding tool with ts-plate.
+It prompts for TypeScript, Vitest, CLI binary setup, and more — then generates a ready-to-use project with ts-plate already wired in. The CLI itself is also built with ts-plate under the hood.
 
 ## Docs
 
