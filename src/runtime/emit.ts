@@ -11,8 +11,8 @@ import type { CopyDirOptions, FileName, Node, Output, OutputFile } from "../type
  *   false conditions are excluded.
  * - Dynamic filenames (functions) are called and resolved.
  * - Dynamic content (functions) are called and resolved.
- * - Filenames are validated (no empty names, no directory traversal, no absolute
- *   paths).
+ * - Filenames and directory names are validated (no empty names, no directory
+ *   traversal, no absolute paths).
  * - Source directory contents are enumerated for {@link CopyDirNode `copy-dir`}
  *   nodes.
  *
@@ -86,6 +86,41 @@ export async function emit(...nodes: Node[]): Promise<Output[]> {
     }
   }
 
+  function validateDirName(name: string): void {
+    if (name.trim().length === 0) {
+      throw new ValidationError(
+        `Directory name validation failed: "${name}". Directory name must be a non-empty string. Got an empty or whitespace-only value.`,
+        {
+          path: name,
+          nodeType: "dir",
+          hint: "Provide a non-empty relative directory name (e.g., 'src').",
+        },
+      );
+    }
+
+    if (name.split("/").includes("..")) {
+      throw new ValidationError(
+        `Directory name validation failed: "${name}". Path traverses outside the target directory. Directory traversal ('..') is not allowed in directory names.`,
+        {
+          path: name,
+          nodeType: "dir",
+          hint: "Use a relative path that stays within the target directory.",
+        },
+      );
+    }
+
+    if (name.startsWith("/")) {
+      throw new ValidationError(
+        `Directory name validation failed: "${name}". Absolute paths are not permitted. Use a relative directory name instead (e.g., 'src/components').`,
+        {
+          path: name,
+          nodeType: "dir",
+          hint: "Remove the leading '/' and use a relative path instead.",
+        },
+      );
+    }
+  }
+
   async function walkCopyDir(
     source: string,
     targetBase: string,
@@ -130,6 +165,7 @@ export async function emit(...nodes: Node[]): Promise<Output[]> {
         break;
 
       case "dir": {
+        validateDirName(node.name);
         const nextPath = join(basePath, node.name);
         outputs.push({ type: "dir", path: nextPath });
 

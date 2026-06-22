@@ -1,5 +1,6 @@
 import { expect, test } from "vitest";
 import { dir, file, emit, root, when } from "../src";
+import { ValidationError } from "../src/errors";
 
 test("emit evaluates a realistic tree", async () => {
   const tree = root(
@@ -72,4 +73,26 @@ test("async when with dynamic async content inside", async () => {
   );
 
   expect(await emit(tree)).toEqual([{ type: "file", path: "data.txt", content: "async content" }]);
+});
+
+test("validates empty directory name", async () => {
+  await expect(emit(dir("", file("a.txt")))).rejects.toThrow(ValidationError);
+  await expect(emit(dir("  ", file("a.txt")))).rejects.toThrow(ValidationError);
+});
+
+test("validates directory traversal in dir name", async () => {
+  await expect(emit(dir("src/../lib", file("a.txt")))).rejects.toThrow(ValidationError);
+  await expect(emit(dir("../../etc", file("a.txt")))).rejects.toThrow(ValidationError);
+});
+
+test("validates absolute path in dir name", async () => {
+  await expect(emit(dir("/etc", file("a.txt")))).rejects.toThrow(ValidationError);
+});
+
+test("valid nested directory names still pass", async () => {
+  const outputs = await emit(dir("src/lib/utils", file("index.ts")));
+  expect(outputs).toEqual([
+    { type: "dir", path: "src/lib/utils" },
+    { type: "file", path: "src/lib/utils/index.ts" },
+  ]);
 });
