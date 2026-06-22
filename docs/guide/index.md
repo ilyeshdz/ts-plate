@@ -55,6 +55,23 @@ await write(outputs);
 
 ts-plate is for building generators, CLIs, and scaffolding tools. It is not a CLI itself. Use it when you want full control over how files are generated. Skip it if you want something turnkey.
 
+## Real-world example: create-ts-plate
+
+[`create-ts-plate`](https://github.com/ilyeshdz/create-ts-plate) is an interactive scaffolding CLI built entirely on ts-plate. It shows what a production-ready generator looks like:
+
+- Uses `when()` to conditionally scaffold features (TypeScript, tests, etc.)
+- Composes reusable factory functions for components, configs, and project files
+- Lets the user preview the tree before writing via `emit()` — a true dry run
+- Calls `write()` only after confirmation
+
+Try it:
+
+```bash
+npx create-ts-plate
+```
+
+It's also the best reference for patterns and conventions if you want to build your own CLI on top of ts-plate.
+
 ## Install
 
 ::: code-group

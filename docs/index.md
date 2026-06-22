@@ -32,6 +32,9 @@ features:
   - icon: 🧪
     title: Testable
     details: Emit returns an array. Snapshot it, transform it, assert on it. No mock filesystem needed.
+  - icon: 🚀
+    title: Build your own CLI
+    details: ts-plate powers [`create-ts-plate`](https://github.com/ilyeshdz/create-ts-plate), an interactive scaffolding CLI. You can build one too.
 ---
 
 ```ts
