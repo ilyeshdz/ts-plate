@@ -22,8 +22,9 @@ export type Condition = boolean | (() => boolean | Promise<boolean>);
  *
  * - `string` — written as-is.
  * - `Record<string, any>` — serialized to pretty-printed JSON.
+ * - `Uint8Array` — written as raw bytes (binary files).
  */
-export type FileContent = string | Record<string, any>;
+export type FileContent = string | Record<string, any> | Uint8Array;
 
 /**
  * Lazy content resolver for a file node.

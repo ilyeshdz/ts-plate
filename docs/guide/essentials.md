@@ -2,11 +2,12 @@
 
 ## file()
 
-Create a file with static content, a JSON object, or a lazy function.
+Create a file with static content, a JSON object, binary data, or a lazy function.
 
 ```ts
 file("readme.md", "# Project Title"); // static text
 file("package.json", { name: "my-app" }); // JSON (auto-serialized)
+file("icon.png", new Uint8Array([137, 80, 78, 71])); // raw bytes
 file("data.json", async () => {
   // lazy (runs at emit)
   const res = await fetch("https://api.example.com/config");

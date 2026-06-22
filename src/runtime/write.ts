@@ -3,11 +3,14 @@ import { dirname, resolve } from "node:path";
 import { ConflictError, FileSystemError, ValidationError } from "../errors";
 import type { FileContent, FileStrategy, Output } from "../types";
 
-function serializeContent(content: FileContent | undefined): string {
+function serializeContent(content: FileContent | undefined): string | Uint8Array {
   if (content === undefined) {
     return "";
   }
   if (typeof content === "string") {
+    return content;
+  }
+  if (content instanceof Uint8Array) {
     return content;
   }
   return JSON.stringify(content, null, 2);
@@ -185,7 +188,7 @@ export async function write(outputs: Output[], basePath?: string): Promise<void>
 
       const content = serializeContent(output.content);
       try {
-        await writeFile(fullPath, content, "utf-8");
+        await writeFile(fullPath, content, typeof content === "string" ? "utf-8" : undefined);
       } catch (cause) {
         throw new FileSystemError(`Failed to write file '${output.path}'.`, {
           path: output.path,

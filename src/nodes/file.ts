@@ -16,8 +16,9 @@ import type {
  *
  * @param name - Static filename, sync resolver `() => string`, or async
  *               resolver `() => Promise<string>`. Resolved during `emit()`.
- * @param content - Static content (`string` written as-is, `Record` serialized
- *                  to JSON), or a sync/async resolver. Evaluated during `emit()`.
+ * @param content - Static content (`string` written as-is, `Uint8Array` for
+ *                  binary, `Record` serialized to JSON), or a sync/async
+ *                  resolver. Evaluated during `emit()`.
  * @param options - File behavior options including the conflict `strategy`.
  * @returns A `FileNode` ready to be composed into a tree.
  *
@@ -28,6 +29,9 @@ import type {
  *
  * // JSON content (serialized with JSON.stringify)
  * file("package.json", { name: "my-project" })
+ *
+ * // Binary content (written as raw bytes)
+ * file("icon.png", new Uint8Array([137, 80, 78, 71]))
  *
  * // Dynamic content (evaluated at emit time)
  * file("data.json", () => fetchConfig())
@@ -56,6 +60,19 @@ export function file(
   name: FileName,
   content: Record<string, unknown>,
   options?: FileOptions,
+): FileNode;
+
+/**
+ * Create a file node with binary content.
+ *
+ * @param name - Static filename or dynamic resolver.
+ * @param content - A `Uint8Array` to write as raw bytes.
+ * @param options - File behavior options.
+ */
+export function file(
+  name: FileName,
+  content: Uint8Array,
+  options?: FileOptions & { strategy?: Exclude<FileStrategy, "merge"> },
 ): FileNode;
 
 /**
