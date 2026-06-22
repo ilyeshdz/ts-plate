@@ -1,6 +1,6 @@
 {
   "name": "@ilyeshdz/ts-plate",
-  "version": "0.4.4",
+  "version": "0.5.0",
   "description": "A tiny TypeScript library for composing file trees and generator output.",
   "homepage": "https://github.com/ilyeshdz/ts-plate#readme",
   "bugs": {

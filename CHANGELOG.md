@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.5.0
+
+[compare changes](https://github.com/ilyeshdz/ts-plate/compare/v0.4.4...v0.5.0)
+
+### 🚀 Enhancements
+
+- Support async when() conditions ([8ae3c1e](https://github.com/ilyeshdz/ts-plate/commit/8ae3c1e))
+- Support Uint8Array binary content ([06c2087](https://github.com/ilyeshdz/ts-plate/commit/06c2087))
+
+### 🩹 Fixes
+
+- Validate directory names in emit ([5552878](https://github.com/ilyeshdz/ts-plate/commit/5552878))
+
+### ❤️ Contributors
+
+- Ilyes Hernandez ([@ilyeshdz](https://github.com/ilyeshdz))
+
 ## v0.4.4
 
 [compare changes](https://github.com/ilyeshdz/ts-plate/compare/v0.4.3...v0.4.4)
