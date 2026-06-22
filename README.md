@@ -2,7 +2,8 @@
 
 > Build file trees with TypeScript, not templates.
 
-[![npm](https://img.shields.io/npm/v/@ilyeshdz/ts-plate)](https://www.npmjs.com/package/@ilyeshdz/ts-plate)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/version/@ilyeshdz/ts-plate)](https://npmx.dev/package/@ilyeshdz/ts-plate)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/size/@ilyeshdz/ts-plate)](https://npmx.dev/package/@ilyeshdz/ts-plate)
 
 A tiny, zero-dependency TypeScript library for describing file trees as data and writing them to disk.
 
