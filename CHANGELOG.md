@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.5.1
+
+[compare changes](https://github.com/ilyeshdz/ts-plate/compare/v0.5.0...v0.5.1)
+
+### 🩹 Fixes
+
+- Normalize children in when() for consistency with dir() and root() ([18d76fc](https://github.com/ilyeshdz/ts-plate/commit/18d76fc))
+- Validate copy node names for empty, traversal, and absolute paths ([a4a9243](https://github.com/ilyeshdz/ts-plate/commit/a4a9243))
+- Expose strategy and cause on TsPlateError base class ([ea999d4](https://github.com/ilyeshdz/ts-plate/commit/ea999d4))
+- Align render() signature with emit() using rest params ([9088f1f](https://github.com/ilyeshdz/ts-plate/commit/9088f1f))
+
+### ❤️ Contributors
+
+- Ilyes Hernandez ([@ilyeshdz](https://github.com/ilyeshdz))
+
 ## v0.5.0
 
 [compare changes](https://github.com/ilyeshdz/ts-plate/compare/v0.4.4...v0.5.0)
