@@ -51,13 +51,13 @@ export async function emit(...nodes: Node[]): Promise<Output[]> {
     return typeof name === "function" ? await name() : name;
   }
 
-  function validateFileName(name: string): void {
+  function validateFileName(name: string, nodeType: string = "file"): void {
     if (name.trim().length === 0) {
       throw new ValidationError(
         `Filename validation failed: "${name}". Filename must be a non-empty string. Got an empty or whitespace-only value.`,
         {
           path: name,
-          nodeType: "file",
+          nodeType,
           hint: "Provide a non-empty relative filename (e.g., 'index.ts').",
         },
       );
@@ -68,7 +68,7 @@ export async function emit(...nodes: Node[]): Promise<Output[]> {
         `Filename validation failed: "${name}". Path traverses outside the target directory. Directory traversal ('..') is not allowed in filenames.`,
         {
           path: name,
-          nodeType: "file",
+          nodeType,
           hint: "Use a relative path that stays within the target directory.",
         },
       );
@@ -79,7 +79,7 @@ export async function emit(...nodes: Node[]): Promise<Output[]> {
         `Filename validation failed: "${name}". Absolute paths are not permitted. Use a relative filename instead (e.g., 'src/index.ts').`,
         {
           path: name,
-          nodeType: "file",
+          nodeType,
           hint: "Remove the leading '/' and use a relative path instead.",
         },
       );
@@ -177,6 +177,7 @@ export async function emit(...nodes: Node[]): Promise<Output[]> {
       }
 
       case "copy":
+        validateFileName(node.name, "copy");
         outputs.push({
           type: "copy",
           path: join(basePath, node.name),
