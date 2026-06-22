@@ -9,21 +9,21 @@ import { write } from "./write";
  * Returns the resolved outputs for inspection (e.g., for logging or
  * dry-run comparison).
  *
- * @param nodes - One or more nodes to evaluate and write.
  * @param basePath - Optional base directory for writing. All output paths
  *                   are resolved relative to this. Defaults to `process.cwd()`.
+ * @param nodes - One or more nodes to evaluate and write.
  * @returns A promise of the resolved {@link Output} array that was written.
  *
  * @example
  * ```ts
  * const outputs = await render(
- *   [root(file("hello.txt", "world"))],
  *   "./dist",
+ *   root(file("hello.txt", "world")),
  * );
  * // outputs: [{ type: "file", path: "hello.txt", content: "world" }]
  * ```
  */
-export async function render(nodes: Node[], basePath?: string): Promise<Output[]> {
+export async function render(basePath?: string, ...nodes: Node[]): Promise<Output[]> {
   const outputs = await emit(...nodes);
   await write(outputs, basePath);
   return outputs;

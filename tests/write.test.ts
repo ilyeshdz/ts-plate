@@ -46,7 +46,7 @@ test("write with custom basePath", async () => {
 });
 
 test("render emits and writes in one call", async () => {
-  const outputs = await render([file("hello.txt", "world")], "/root");
+  const outputs = await render("/root", file("hello.txt", "world"));
 
   expect(outputs).toEqual([{ type: "file", path: "hello.txt", content: "world" }]);
   expect(fs.readFileSync("/root/hello.txt", "utf-8")).toBe("world");

@@ -37,7 +37,7 @@ test("write writes Uint8Array content as raw bytes", async () => {
 
 test("render emits and writes binary content", async () => {
   const bytes = new Uint8Array([255, 254, 253]);
-  await render([root(file("bin.dat", bytes))], "/root");
+  await render("/root", root(file("bin.dat", bytes)));
 
   const written = fs.readFileSync("/root/bin.dat");
   expect(written).toEqual(Buffer.from(bytes));

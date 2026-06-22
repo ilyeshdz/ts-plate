@@ -55,7 +55,7 @@ test("copy-dir writes files to disk through render", async () => {
     "/templates/src/index.ts": "console.log('hi')",
   });
 
-  await render([root(dir("output", copy("/templates")))], "/");
+  await render("/", root(dir("output", copy("/templates"))));
 
   expect(fs.readFileSync("/output/README.md", "utf-8")).toBe("# Template");
   expect(fs.readFileSync("/output/src/index.ts", "utf-8")).toBe("console.log('hi')");

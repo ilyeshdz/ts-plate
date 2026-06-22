@@ -113,17 +113,17 @@ test("merge strategy", async () => {
 test("conflict strategies work through render end-to-end", async () => {
   // overwrite
   fs.writeFileSync("/file.txt", "old");
-  await render([root(file("file.txt", "new"))], "/");
+  await render("/", root(file("file.txt", "new")));
   expect(fs.readFileSync("/file.txt", "utf-8")).toBe("new");
 
   // skip
   fs.writeFileSync("/keep.txt", "original");
-  await render([root(file("keep.txt", "new", { strategy: "skip" }))], "/");
+  await render("/", root(file("keep.txt", "new", { strategy: "skip" })));
   expect(fs.readFileSync("/keep.txt", "utf-8")).toBe("original");
 
   // error
   fs.writeFileSync("/conflict.txt", "existing");
   await expect(
-    render([root(file("conflict.txt", "new", { strategy: "error" }))], "/"),
+    render("/", root(file("conflict.txt", "new", { strategy: "error" }))),
   ).rejects.toThrow("file already exists and strategy is 'error'");
 });
